@@ -11,21 +11,21 @@ export const environment = {
   hosting: 'https://app.dontramp.com',
   googleClientId: '346346436-i6u333aesgdsgli32r8v96f9hb.apps.googleusercontent.com',
   firebaseConfig: {
-//    apiKey: 'AIzaSyA2kx6yOWOUW8kkwX74fNZ-x9_3MooHF7E',
-//     authDomain: 'iderby-music.firebaseapp.com',
-//     databaseURL: 'https://iderby-music.firebaseio.com',
-//     projectId: 'iderby-music',
-//     storageBucket: 'iderby-music.appspot.com',
-//     messagingSenderId: '46838646293',
-//     appId: '1:46838646293:android:031018036ca5e25b'
-	apiKey: "AIzaSyAjiaOdlpdEaItO4p8nmCKsB8GoiFYtcXw",
-	authDomain: "drshop-ce5f6.firebaseapp.com",
-	databaseURL: "https://drshop-ce5f6.firebaseio.com",
-	projectId: "drshop-ce5f6",
-	storageBucket: "drshop-ce5f6.appspot.com",
-	messagingSenderId: "753908469295",
-	appId: "1:753908469295:web:98ecd65aa37edd849640da",
-	measurementId: "G-56W3PXXCJ9"
+   apiKey: 'AIzaSyA2kx6yOWOUW8kkwX74fNZ-x9_3MooHF7E',
+    authDomain: 'iderby-music.firebaseapp.com',
+    databaseURL: 'https://iderby-music.firebaseio.com',
+    projectId: 'iderby-music',
+    storageBucket: 'iderby-music.appspot.com',
+    messagingSenderId: '46838646293',
+    appId: '1:46838646293:android:031018036ca5e25b'
+	// apiKey: "AIzaSyAjiaOdlpdEaItO4p8nmCKsB8GoiFYtcXw",
+	// authDomain: "drshop-ce5f6.firebaseapp.com",
+	// databaseURL: "https://drshop-ce5f6.firebaseio.com",
+	// projectId: "drshop-ce5f6",
+	// storageBucket: "drshop-ce5f6.appspot.com",
+	// messagingSenderId: "753908469295",
+	// appId: "1:753908469295:web:98ecd65aa37edd849640da",
+	// measurementId: "G-56W3PXXCJ9"
   },
   AdMobFreeBannerConfig: {
 		isTesting: true,

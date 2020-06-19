@@ -90,6 +90,7 @@ export class FeedComponent extends Extender implements OnInit {
     this.user = await this.authService.getUser();
     this.openPostFromUrl();
     this.getFilteredMessages();
+    this.loadPosts();
     // this.feedService.getFeed(this.user.uid).pipe(take(1)).subscribe(
     //     (feed: IFeed[]) => {
     //       if (!feed.length) {
@@ -142,7 +143,7 @@ export class FeedComponent extends Extender implements OnInit {
   }
 
   ionViewDidEnter() {
-    this.loadPosts();
+    // this.loadPosts();
   }
 
   public doRefreshTop(event?: any) {
