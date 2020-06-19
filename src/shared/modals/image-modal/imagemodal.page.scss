@@ -1,0 +1,24 @@
+.close-fake {
+  --background: transparent;
+  z-index: 1000;
+  ion-icon {
+    font-size: 2rem;
+  }
+  
+}
+
+ion-content {
+  --background: rgba(255, 255, 255, 255);
+}
+ion-slides {
+  height: 80%;
+}
+.ion-float-right{
+margin-right: 19px;
+margin-top: 12px;
+}
+
+.close{
+margin-top: 1px;
+}
+

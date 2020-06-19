@@ -1,0 +1,18 @@
+  <!-- <ion-grid>
+    <ion-row>
+        <ion-col *ngFor="let post of posts" size="12">
+          <div class="image" [image-loader]="post.images" (click)="open(post.images)" *ngIf="post.images!==''"></div>
+          <iframe *ngIf="post.videoContent!==''" style="width: 100%;" [src]="post.videoContent | youtube" frameborder="0" allowfullscreen></iframe>
+        </ion-col>
+    </ion-row>
+  </ion-grid> -->
+  <ion-refresher slot="fixed" (ionRefresh)="doReload($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <feed-minimal *ngFor="let item of feeds; let i = index"
+                  [feed]="item"
+                  [itemIndex]="i"
+                  (event)="manage($event)"></feed-minimal>
+<app-spinner *ngIf="loading"></app-spinner>
+<app-no-data *ngIf="feeds.length === 0"></app-no-data>
+

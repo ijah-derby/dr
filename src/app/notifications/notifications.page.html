@@ -1,0 +1,89 @@
+<ion-toolbar color="favorite">
+  <ion-buttons slot="start">
+    <ion-menu-button color="medium" size="small" autoHide="true"></ion-menu-button>
+  </ion-buttons>
+  <img id="hide" alt="appicon" height="22" style="margin-right: 10px;" class="ion-float-right" src="assets/images/logo1.png"/>
+
+</ion-toolbar>
+
+ <ion-menu-button class="writer" menu="second" autoHide="true">
+  <img  alt="appicon" src="assets/images/pull.png"/>
+</ion-menu-button>
+
+<ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <h3><b>Notifications</b></h3>
+      </ion-col>
+      <!-- <ion-col style="text-align: right;">
+        <ion-icon name="search" size="large" (click)="search = !search"></ion-icon>
+      </ion-col> -->
+    </ion-row>
+<!--    <ion-row>-->
+<!--      <ion-col>-->
+<!--        <ion-searchbar animated="true" showCancelButton="focus" value="Search here..." *ngIf="search"></ion-searchbar>-->
+<!--      </ion-col>-->
+<!--    </ion-row>-->
+  </ion-grid>
+
+  <ion-list lines="none">
+     <ion-item-sliding *ngFor="let item of notifications; let i = index;">
+
+      <!-- *ngIf="(item.by != currentUser.uid && item.type == 2) || (item.by == currentUser.uid && item.type != 2)" -->
+      <ion-item class="ion-no-margin ion-no-padding" (click)="goToPage(item)">
+        <ion-grid>
+          <ion-row>
+            <ion-col size="2">
+              <div class="image" [image-loader]="item.photoURL"></div>
+<!--              <img [src]="item.photoURL" width="50px" height="50px" style="border-radius: 50%;" alt="">-->
+            </ion-col>
+            <ion-col size="10">
+                <label *ngIf="!isSeen(item)"><b>{{ item.body }}</b></label>
+                <label *ngIf="isSeen(item)">{{ item.body }}</label>
+                <br>
+                <label class="ion-no-margin ion-no-padding" style="font-size: small;color:gray;">{{ item.timestamp?.toDate() | amTimeAgo }}</label>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-item>
+
+      <ion-item-options side="end">
+        <ion-item-option color="danger">
+          <ion-icon style="width:30px;height:30px;" name="trash" (click)="deleteNotification(item.id)"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
+
+    </ion-item-sliding>
+  </ion-list>
+
+<app-spinner *ngIf="loading"></app-spinner>
+
+</ion-content>
+
+
+
+
+
+<ion-toolbar>
+<ion-tabs>
+    <ion-tab-bar slot="bottom">
+
+ <ion-tab-button routerLink="/feed" routerDirection="forward">
+           <ion-icon name="home" style="width: 30px; height: 50px;"></ion-icon>
+      </ion-tab-button>
+
+       <ion-tab-button routerLink="/profile" routerDirection="forward">
+           <ion-icon name="person" style="width: 28px; height: 50px;"></ion-icon>
+      </ion-tab-button>
+
+    <ion-tab-button routerLink="/people" routerDirection="forward">
+           <ion-icon name="ios-people" style="width: 35px; height: 50px;"></ion-icon>
+      </ion-tab-button>
+     
+    
+
+
+    </ion-tab-bar>
+  </ion-tabs>
+ </ion-toolbar> 

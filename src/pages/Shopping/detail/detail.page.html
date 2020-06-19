@@ -1,0 +1,151 @@
+<ion-header>
+	<ion-toolbar>
+		<ion-buttons slot="start">
+			<ion-back-button class="fs-24 txt1" text="" icon="ios-arrow-round-back"></ion-back-button>
+			<!-- <ion-menu-button>
+				<ion-icon class="fs-24 txt1" name="arrow-round-forward"></ion-icon>
+		</ion-menu-button> -->
+		</ion-buttons>
+
+		<ion-buttons slot="end">
+			<ion-button fill="clear" class="shadow-0 txt1" [routerLink]="'/search'" routerDirection="forward">
+				<ion-icon name="search"></ion-icon>
+			</ion-button>
+			<ion-button fill="clear" class="shadow-0 txt1" [routerLink]="'/mycart'" routerDirection="forward">
+				<ion-icon name="cart"></ion-icon>
+			</ion-button>
+		</ion-buttons>
+
+		<ion-title>Detail</ion-title>
+	</ion-toolbar>
+</ion-header>
+
+<ion-content *ngIf="obj != null">
+	<div class="top-slide">
+		<div class="wrap-slide">
+			<ion-slides>
+				<ion-slide *ngIf="obj.payload.doc.data().thumb && obj.payload.doc.data().thumb != null && obj.payload.doc.data().thumb != ''">
+					<div class="thumb flex-ali-center flex-jus-center ovfl-hidden">
+						<img src="{{obj.payload.doc.data().thumb}}">
+					</div>
+				</ion-slide>
+				<ion-slide *ngIf="obj.payload.doc.data().thumb1 && obj.payload.doc.data().thumb1 != null && obj.payload.doc.data().thumb1 != ''">
+					<div class="thumb flex-ali-center flex-jus-center ovfl-hidden">
+						<img src="{{obj.payload.doc.data().thumb1}}">
+					</div>
+				</ion-slide>
+				<ion-slide *ngIf="obj.payload.doc.data().thumb2 && obj.payload.doc.data().thumb2 != null && obj.payload.doc.data().thumb2 != ''">
+					<div class="thumb flex-ali-center flex-jus-center ovfl-hidden">
+						<img src="{{obj.payload.doc.data().thumb2}}">
+					</div>
+				</ion-slide>
+				<ion-slide *ngIf="obj.payload.doc.data().thumb3 && obj.payload.doc.data().thumb3 != null && obj.payload.doc.data().thumb3 != ''">
+					<div class="thumb flex-ali-center flex-jus-center ovfl-hidden">
+						<img src="{{obj.payload.doc.data().thumb3}}">
+					</div>
+				</ion-slide>
+				<ion-slide *ngIf="obj.payload.doc.data().thumb4 && obj.payload.doc.data().thumb4 != null && obj.payload.doc.data().thumb4 != ''">
+					<div class="thumb flex-ali-center flex-jus-center ovfl-hidden">
+						<img src="{{obj.payload.doc.data().thumb4}}">
+					</div>
+				</ion-slide>
+			</ion-slides>
+		</div>
+		<div class="title" padding>
+			<div class="wrap-txt">
+				<h3 class="txt-light fs-22 spacing-1 fw-600">{{obj.payload.doc.data().name}}</h3>
+			</div>
+			<ion-button fill="clear" class="favo-btn" *ngIf="favo_str.search(obj.payload.doc.id) > -1" (click)="favorites()">
+              <ion-icon class="txt-danger" name="ios-bookmark"></ion-icon>
+            </ion-button>
+            <ion-button fill="clear" class="favo-btn" *ngIf="favo_str.search(obj.payload.doc.id) < 0" (click)="favorites()">
+              <ion-icon class="txt-light" name="ios-bookmark"></ion-icon>
+            </ion-button>
+		</div>
+	</div>
+
+	<div class="fact pdl-25 pdr-25 pdb-15 pdt-10">
+		<div text-left class="">
+			<p class="txt3 uppercase spacing-1 fs-12">Point</p>
+			<span class="fw-600">
+				<ion-icon class="mgr-5" name="star"></ion-icon>
+				{{obj.payload.doc.data().vote}}
+			</span>
+			<p class="txt3">Posted at {{obj.payload.doc.data().created.substring(4, 15)}}</p>
+		</div>
+		<div text-right class="price">
+			<p class="txt3 spacing-1 uppercase fs-12">Price</p>
+			<i class="fw-600 line-through pdl-5 pdr-5 mgr-15 txt3 inline-block" *ngIf="currenciesProv && obj.payload.doc.data().discount > 0">
+				{{obj.payload.doc.data().price}}
+			</i>
+			<span class="fw-600" *ngIf="currenciesProv && obj.payload.doc.data().discount > 0">
+				{{obj.payload.doc.data().price - obj.payload.doc.data().price*obj.payload.doc.data().discount/100}} 
+			</span>
+			<span class="fw-600" *ngIf="currenciesProv && obj.payload.doc.data().discount <= 0">
+				{{obj.payload.doc.data().price}}
+			</span>
+		</div>
+	</div>
+
+	<h5 class="uppercase txt1 fs-12 spacing-1 pdl-25 pdr-25">Quantity</h5>
+	<div class="wrap-quantity pdl-25 pdr-25">
+		<div class="quantity mgr-40">
+			<ion-button fill="clear" class="txt1" (click)="quantity(-1)">
+				<ion-icon class="fs-18" name="md-remove"></ion-icon>
+			</ion-button>
+			<div>
+				<ion-input [(ngModel)]="quantityIp" (ionChange)="enterQuantity($event.target.value)" class="fw-600 fs-16 flex-center flex-jus-center flex-ali-center" min="1" max="99" minlength="1" maxlength="2" text-center type="number"></ion-input>
+			</div>
+			<ion-button fill="clear" class="txt1" (click)="quantity(1)">
+				<ion-icon class="fs-18" name="md-add"></ion-icon>
+			</ion-button>
+		</div>
+		<ion-button (click)="addCart()" shape="round" class="uppercase spacing-1 fs-12 fw-600 bg-third">Add cart</ion-button>
+	</div>
+	<br>
+	<div class="description pdl-25 pdr-25">
+		<h5 class="uppercase fs-12 spacing-1 txt1">Description</h5>
+		<p class="txt3">{{obj.payload.doc.data().description}}</p>
+		<br>
+	</div>
+	<br>
+	<br>
+	<br>
+	<div class="social pdl-25 pdr-25 flex-row flex-ali-center flex-jus-end" text-right>
+		<ion-button fill="clear" (click)="share(obj.payload.doc.data().link_share)" class="fs-18 txt1">
+			<ion-icon name="logo-facebook"></ion-icon>
+		</ion-button>
+		<ion-button fill="clear" (click)="share(obj.payload.doc.data().link_share)" class="fs-18 txt3">
+			<ion-icon name="logo-twitter"></ion-icon>
+		</ion-button>
+		<ion-button fill="clear" (click)="share(obj.payload.doc.data().link_share)" class="fs-18 txt3">
+			<ion-icon name="logo-google"></ion-icon>
+		</ion-button>
+		<ion-button fill="clear" (click)="share(obj.payload.doc.data().link_share)" class="fs-18 txt3">
+			<ion-icon name="logo-instagram"></ion-icon>
+		</ion-button>
+	</div>
+	<br>
+	<br>
+	<div class="description pdl-25 pdr-25">
+		<h5 class="uppercase fs-12 spacing-1 txt1">Related</h5>
+		<br>
+		<div class="wrap-related" *ngIf="list_related">
+			<ion-slides [options]="slidePerViewOpts">
+				<ion-slide *ngFor="let item of list_related" [routerLink]="['/detail', {id_item: item.payload.doc.id}]">
+					<div text-left class="item-slide">
+						<div class="thumb">
+							<img src="{{item.payload.doc.data().thumb2}}">
+						</div>
+						<h4 class="fw-500 fs-12 txt1 ellipsis">{{item.payload.doc.data().name}}</h4>
+					</div>
+				</ion-slide>
+			</ion-slides>
+		</div>
+	</div>
+
+	<br>
+	<br>
+	<br>
+
+</ion-content>

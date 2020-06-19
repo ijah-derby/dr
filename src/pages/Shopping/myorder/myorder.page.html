@@ -1,0 +1,136 @@
+
+<ion-header>
+	<ion-toolbar>
+		<ion-buttons slot="start" class="ion-no-padding ion-no-margin">
+			<ion-back-button class="ion-no-padding ion-no-margin">
+				<!-- <ion-icon style="color: black;font-size: 26px;margin-left: 4px;" src="../../../assets/icons/chevron-back.svg" (click)="goBack()"></ion-icon> -->
+			</ion-back-button>
+			<ion-menu-button menu="shop">
+			</ion-menu-button>
+		  </ion-buttons>
+
+		<ion-buttons slot="end">
+			<ion-button fill="clear" class="shadow-0 txt1" [routerLink]="'/search'" routerDirection="forward">
+				<ion-icon name="search"></ion-icon>
+			</ion-button>
+			<ion-button fill="clear" class="shadow-0 txt1" [routerLink]="'/mycart'" routerDirection="forward">
+				<ion-icon name="cart"></ion-icon>
+			</ion-button>
+		</ion-buttons>
+
+		<ion-title>My Order</ion-title>
+	</ion-toolbar>
+</ion-header>
+
+
+<ion-content padding class="bg-l1">
+	<br>
+	<h2 class="uppercase" *ngIf="list_orders_pending.length > 0">Orders are waiting to be completed</h2>
+	<br>
+	<div class="" *ngIf="list_orders_pending.length > 0">
+		<div *ngFor="let item of list_orders_pending" class="item-order bg-white mgb-20 shadow-2" padding>
+			<div class="top">
+				<p class="txt-b1 fw-600">Order #{{item.payload.doc.id}}</p>
+				<p text-right class="txt-b3">{{item.payload.doc.data().created.substring(4, 15)}}</p>
+			</div>
+			<p class="txt-b1 fw-600 mgt-0 txt-warning pd-2 bg-black-3 pdl-10">
+				<ion-icon class="mgr-5 txt-warning" name="card"></ion-icon>
+				Shipped pending
+			</p>
+			<hr/>
+			<div class="-wrap-prd">
+				<div *ngFor="let elmt of item.lst_items" class="elm-prd" [routerLink]="['/detail', {id_item: elmt.id}]">
+					<h4 class="fs-14 mgb-0 name">{{elmt.name}}</h4>
+					<p class="txt-b3 quantity">x {{elmt.quantity}}</p>
+					<p class="txt-b3 price" text-right>{{elmt.price}} {{(elmt.discount > 0)? '(-'+ elmt.discount +'%)' : null}}</p>
+				</div>
+			</div>
+			<br>
+			<div class="bottom">
+				<p class="txt-b3">
+					<ion-icon name="ios-pin"></ion-icon>
+					{{item.payload.doc.data().address}}
+				</p>
+				<hr/>
+				<p class="txt-b3 mg-0">
+					After Tax: 
+					<strong class="txt-b1 pull-right" text-right>{{item.payload.doc.data().total_price}}</strong>
+				</p>
+				<p class="txt-b3 mg-0">
+					Tax ({{settings.tax_fee}}%): 
+					<strong class="txt-b1 pull-right" text-right>{{item.payload.doc.data().tax_pay}}</strong>
+				</p>
+				<p class="txt-b3 mg-0">
+					Ship fee ({{settings.ship_fee}}/km): 
+					<strong class="txt-b1 pull-right" text-right>{{item.payload.doc.data().shipfee_pay}}</strong>
+				</p>
+				<p class="txt-b3 fs-18">
+					Total: 
+					<strong class="txt-b1 pull-right" text-right>{{item.payload.doc.data().total_pay}}</strong>
+				</p>
+			</div>
+			<div class="" text-right>
+				<hr class="bg-light">
+				<p class="txt1 italic fw-600" *ngIf="item.payload.doc.data().pay_method == 1">Payment on delivery</p>
+				<p class="txt1 italic fw-600" *ngIf="item.payload.doc.data().pay_method == 2">Payment by credit card</p>
+				<p class="txt1 italic fw-600" *ngIf="item.payload.doc.data().pay_method == 3">Payment use Paypal</p>
+			</div>
+		</div>
+	</div>
+
+	<br>
+	<h2 class="uppercase" *ngIf="list_orders_success.length > 0">10 most recent orders</h2>
+	<br>
+
+	<div class="" *ngIf="list_orders_success.length > 0">
+		<div *ngFor="let item of list_orders_success" class="item-order bg-white mgb-20 shadow-2" padding>
+			<div class="top">
+				<p class="txt-b1 fw-600">Order #{{item.payload.doc.id}}</p>
+				<p text-right class="txt-b3">{{item.payload.doc.data().created.substring(4, 15)}}</p>
+			</div>
+			<p class="txt-b1 fw-600 mgt-0 txt-success pd-2 bg-black-3 pdl-10">
+				<ion-icon class="mgr-5 txt-success" name="card"></ion-icon>
+				Successfully
+			</p>
+			<hr/>
+			<div class="-wrap-prd">
+				<div *ngFor="let elmt of item.lst_items" class="elm-prd">
+					<h4 class="fs-14 mgb-0 name">{{elmt.name}}</h4>
+					<p class="txt-b3 quantity">x {{elmt.quantity}}</p>
+					<p class="txt-b3 price" text-right>{{elmt.price}}{{(elmt.discount > 0)? '(-'+ elmt.discount +'%)' : null}}</p>
+				</div>
+			</div>
+			<br>
+			<div class="bottom">
+				<p class="txt-b3">
+					<ion-icon name="ios-pin"></ion-icon>
+					{{item.payload.doc.data().address}}
+				</p>
+				<hr/>
+				<p class="txt-b3 mg-0">
+					After Tax: 
+					<strong class="txt-b1 pull-right" text-right>{{item.payload.doc.data().total_price}}</strong>
+				</p>
+				<p class="txt-b3 mg-0">
+					Tax ({{settings.tax_fee}}%): 
+					<strong class="txt-b1 pull-right" text-right>{{item.payload.doc.data().tax_fee}}</strong>
+				</p>
+				<p class="txt-b3 mg-0">
+					Ship fee ({{settings.ship_fee}}/km): 
+					<strong class="txt-b1 pull-right" text-right>{{item.payload.doc.data().shipfee_pay}}</strong>
+				</p>
+				<p class="txt-b3 fs-18">
+					Total: 
+					<strong class="txt-b1 pull-right" text-right>{{item.payload.doc.data().total_pay}}</strong>
+				</p>
+			</div>
+			<div class="" text-right>
+				<hr class="bg-light">
+				<p class="txt1 italic fw-600" *ngIf="item.payload.doc.data().pay_method == 1">Payment on delivery</p>
+				<p class="txt1 italic fw-600" *ngIf="item.payload.doc.data().pay_method == 2">Payment by credit card</p>
+				<p class="txt1 italic fw-600" *ngIf="item.payload.doc.data().pay_method == 3">Payment use Paypal</p>
+			</div>
+		</div>
+	</div>
+
+</ion-content>

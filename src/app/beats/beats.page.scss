@@ -1,0 +1,17 @@
+.ion-float-right{
+   
+    Margin-top: -1px;
+}
+
+.writer {
+    position: fixed;
+    Top: 5px;
+    Left: 5px;
+    z-index: 999; 
+}
+
+@media (min-width:829px) {
+  img#hide {
+    display: none;
+  }
+}

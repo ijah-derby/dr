@@ -1,0 +1,27 @@
+.item-order{
+	border-top: 12px dotted var(--ion-background-color);
+	border-bottom: 12px dotted var(--ion-background-color);
+	.top{
+		display: flex;
+		align-items: center;
+		p{
+			flex: 1;
+		}
+	}
+	.elm-prd{
+		display: flex;
+		align-items: center;
+		.name{
+			flex: 3;
+		}
+		.quantity{
+			flex: 1;
+		}
+		.price{
+			flex: 1;
+		}
+	}
+	.bottom{
+
+	}
+}

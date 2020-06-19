@@ -1,0 +1,31 @@
+<ion-toolbar>
+  <ion-buttons slot="start">
+    <ion-menu-button size="small"
+      autoHide="true"></ion-menu-button>
+  </ion-buttons>
+  <img alt="appicon" height="22" class="ion-float-right" src="assets/images/logo1.png"/>
+</ion-toolbar>
+
+<ion-content scrollY="false"
+  scrollX="false">
+  <div class="content-wrapper">
+    <div class="header no-border has-toolbar" style="position: relative;">
+      <div class="title" style="position: relative; top: 5px;">
+        {{'dashboard-component.title' | translate}}
+      </div>
+      <div class="noti-icon" (click)="goToNotifications()" style="margin-right: 15%;">
+        <ion-icon name="notifications" style="width: 30px; height: 50px;"></ion-icon>
+        <ion-badge *ngIf="notificationCounter > 0" color="green">{{ notificationCounter }}</ion-badge>
+      </div>
+      <div class="noti-icon" (click)="goToMessages()">
+        <ion-icon name="chatbubbles" slot="end" style="width: 30px; height: 50px;"></ion-icon>
+        <ion-badge *ngIf="counter > 0" color="green">{{ counter }}</ion-badge>
+      </div>
+    </div>
+
+    <app-tab-menu [tabs]="views"></app-tab-menu>
+    <div class="content-scroll">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</ion-content>

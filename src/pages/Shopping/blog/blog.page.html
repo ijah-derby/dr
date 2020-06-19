@@ -1,0 +1,79 @@
+<ion-header>
+	<ion-toolbar>
+		<ion-buttons slot="start" class="ion-no-padding ion-no-margin">
+			<ion-back-button class="ion-no-padding ion-no-margin">
+				<!-- <ion-icon style="color: black;font-size: 26px;margin-left: 4px;" src="../../../assets/icons/chevron-back.svg" (click)="goBack()"></ion-icon> -->
+			</ion-back-button>
+			<ion-menu-button menu="shop">
+			</ion-menu-button>
+		  </ion-buttons>
+
+		<ion-title>Blog</ion-title>
+	</ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+	<h2 class="uppercase spacing-1 pdr-50" padding>Our articles, invite you to follow</h2>
+
+	<div class="wrap-top-slide" *ngIf="list_post_star">
+		<ion-slides spaceBetween="10" slidesPerView="2" loop="true">
+			<ion-slide *ngFor="let item of list_post_star" [routerLink]="['/post', item]">
+				<div text-left class="item-slide">
+					<div class="thumb ovfl-hidden">
+						<img src="{{item.thumb}}">
+					</div>
+					<p class="pdl-15 pdr-15 ellipsis txt3 mgb-0 fs-14">{{item.name}}</p>
+					<h4 class="pdl-15 pdr-15 fw-500 fs-18 txt1 mgt-0 ellipsis">{{item.description}}</h4>
+				</div>
+			</ion-slide>
+		</ion-slides>
+	</div>
+
+	<h2 class="uppercase spacing-1 pdr-50" padding>New post</h2>
+
+	<div class="wrap-new-slide" *ngIf="list_post_new">
+		<ion-slides spaceBetween="10" slidesPerView="2" loop="true">
+			<ion-slide *ngFor="let item of list_post_new" [routerLink]="['/post', item]">
+				<div text-left class="item-slide flex-row">
+					<div class="thumb ovfl-hidden flex-1">
+						<img src="{{item.thumb}}">
+					</div>
+					<div class="description ovfl-hidden flex-2">
+						<h4 class="pdl-15 pdr-15 fw-500 fs-16 txt1 mgt-10 mgb-0 ellipsis">{{item.name}}</h4>
+						<span class="pdl-15 fs-12 txt3">{{item.created.substring(4, 15)}}</span>
+						<p class="pdl-15 pdr-15 ellipsis txt3 mg-0 fs-12">{{item.description}}</p>
+					</div>
+				</div>
+			</ion-slide>
+		</ion-slides>
+	</div>
+
+	<br>
+	<br>
+
+	<h2 class="uppercase spacing-1 pdr-50" padding>All our posts</h2>
+
+	<div class="">
+		<ion-row>
+			<ion-col size="6" *ngFor="let item of list_post" [routerLink]="['/post', item]">
+				<div class="item-post mgb-30">
+					<div class="thumb ovfl-hidden">
+						<img src="{{item.thumb}}">
+					</div>
+					<div class="description">
+						<h3 class="fs-14 txt1 fw-600 mgt-10">{{item.name}}</h3>
+						<span class="fs-12 txt3">{{item.created.substring(4, 15)}}</span>
+						<p class="fs-12 txt3">{{item.description}}</p>
+					</div>
+				</div>
+			</ion-col>
+		</ion-row>
+	</div>
+
+	<br>
+
+	<ion-infinite-scroll (ionInfinite)="loadMore($event)">
+		<ion-infinite-scroll-content></ion-infinite-scroll-content>
+	</ion-infinite-scroll>
+
+</ion-content>

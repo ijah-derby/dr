@@ -1,0 +1,15 @@
+.list-prd-list{
+	.item-prd{
+		display: flex;
+		align-items: center;
+		border-bottom: 1px solid #ebebeb;
+		.thumb{
+			height: 80px;
+			width: 90px;
+			img{
+				height: 100%;
+				min-width: 100%;
+			}
+		}
+	}
+}

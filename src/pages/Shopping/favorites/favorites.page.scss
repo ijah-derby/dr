@@ -1,0 +1,17 @@
+.wrap-top-slide{
+	width: 130%;
+	.thumb{
+		height: 100px;
+	}
+}
+.list-prd-list{
+	.item-prd{
+		display: flex;
+		align-items: center;
+		border-bottom: 1px solid #ebebeb;
+		.thumb{
+			height: 80px;
+			width: 90px;
+		}
+	}
+}

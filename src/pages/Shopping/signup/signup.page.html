@@ -1,0 +1,100 @@
+<ion-header>
+	<ion-toolbar>
+		<ion-buttons slot="start">
+			<ion-back-button class="fs-24 txt1" text="" icon="ios-arrow-round-back"></ion-back-button>
+		</ion-buttons>
+
+		<ion-title>Forgot</ion-title>
+	</ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+	<div class="wrapp-pst" padding>
+		<div padding class="mgt-50">
+			<h1 class="uppercase fw-900 fs-30 spacing-3 mgb-0">KIWI</h1>
+			<h3 class="uppercase fw-600 fs-20 spacing-2 mgl-20 pdt-0">Create a new account</h3>
+			<p class="pdl-20 fs-12">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+		</div>
+
+		<br><br><br>
+		<br><br>
+
+		<div class="wrapp-form mgt--50" padding>
+			<form [formGroup]="signupForm" (submit)="signupUser()" novalidate>
+				<br>
+				<ion-label stacked class="mgb-5">Full name</ion-label>
+				<ion-list class="ani-bottom-to-top mgb-0">
+					<ion-item class="white-opct bdra-30">
+						<ion-input #email formControlName="fullname" type="text" placeholder="Your name" [class.invalid]="!signupForm.controls.fullname.valid && signupForm.controls.fullname.dirty" class=""></ion-input>
+					</ion-item>
+				</ion-list>
+				
+				<div class="error-message" *ngIf="!signupForm.controls.fullname.valid && signupForm.controls.fullname.dirty">
+					<p class="fs-11 mgt-5">Please enter a valid fullname.</p>
+				</div>
+
+				<br>
+				<ion-label stacked class="mgb-5">Email</ion-label>
+				<ion-list class="ani-bottom-to-top mgb-0">
+					<ion-item class="white-opct bdra-30">
+						<ion-input #email formControlName="email" type="email" placeholder="Your email address" [class.invalid]="!signupForm.controls.email.valid && signupForm.controls.email.dirty" class=""></ion-input>
+					</ion-item>
+				</ion-list>
+				
+				<div class="error-message" *ngIf="!signupForm.controls.email.valid && signupForm.controls.email.dirty">
+					<p class="fs-11 mgt-5">Please enter a valid email.</p>
+				</div>
+
+				<br>
+				<ion-label stacked class="mgb-5">Phone</ion-label>
+				<ion-list class="ani-bottom-to-top mgb-0">
+					<ion-item class="white-opct bdra-30">
+						<ion-input #email formControlName="phone" type="number" placeholder="Your phone address" [class.invalid]="!signupForm.controls.phone.valid && signupForm.controls.phone.dirty" class=""></ion-input>
+					</ion-item>
+				</ion-list>
+				
+				<div class="error-message" *ngIf="!signupForm.controls.phone.valid && signupForm.controls.phone.dirty">
+					<p class="fs-11 mgt-5">Please enter a valid phone.</p>
+				</div>
+
+
+				<br>
+				<ion-label stacked class="mgb-5">Address</ion-label>
+				<ion-list class="ani-bottom-to-top mgb-0">
+					<ion-item class="white-opct bdra-30">
+						<ion-input #email formControlName="address" type="text" placeholder="Your address" [class.invalid]="!signupForm.controls.address.valid && signupForm.controls.address.dirty" class=""></ion-input>
+					</ion-item>
+				</ion-list>
+				
+				<div class="error-message" *ngIf="!signupForm.controls.address.valid && signupForm.controls.address.dirty">
+					<p class="fs-11 mgt-5">Please enter a valid address.</p>
+				</div>
+
+
+
+				<br>
+				<ion-label stacked class="mgt-15 mgb-5">Password</ion-label>
+				<ion-list class="ani-bottom-to-top mgb-0">
+					<ion-item class="white-opct bdra-30">
+						<ion-input #password formControlName="password" type="password" placeholder="Your password" [class.invalid]="!signupForm.controls.password.valid && signupForm.controls.password.dirty" class=""></ion-input>
+					</ion-item>
+				</ion-list>
+				
+				<div class="error-message" *ngIf="!signupForm.controls.password.valid && signupForm.controls.password.dirty">
+					<p class="fs-11 mgt-5">Your password needs more than 6 characters.</p>
+				</div>
+
+				<br>
+
+				<ion-button expand="block" shape="round" class="mgt-30" type="submit">
+					Create an Account
+				</ion-button>
+			</form>
+		</div>
+
+		<br>
+		<br>
+		<br>
+
+	</div>
+</ion-content>

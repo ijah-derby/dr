@@ -1,0 +1,41 @@
+<ion-header>
+	<ion-toolbar>
+		<ion-buttons slot="start" class="ion-no-padding ion-no-margin">
+			<ion-back-button class="ion-no-padding ion-no-margin">
+				<!-- <ion-icon style="color: black;font-size: 26px;margin-left: 4px;" src="../../../assets/icons/chevron-back.svg" (click)="goBack()"></ion-icon> -->
+			</ion-back-button>
+			<ion-menu-button menu="shop">
+			</ion-menu-button>
+		</ion-buttons>
+
+		<ion-buttons slot="end">
+			<ion-button fill="clear" class="shadow-0 txt1" [routerLink]="'/mycart'" routerDirection="forward">
+				<ion-icon name="cart"></ion-icon>
+			</ion-button>
+		</ion-buttons>
+
+		<ion-title>Shop</ion-title>
+	</ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+	<div class="" *ngFor="let item of list_cat">
+		<br>
+		<br>
+		<br>
+		<br>
+		<br>
+		<div class="item-cat white" padding (click)="goToList(item)">
+			<div class="thumb ovfl-hidden flex-row flex-ali-center flex-jus-center mgt--70 mgr-30 shadow-3">
+				<img class="" src="{{item.payload.doc.data().thumb}}">
+			</div>
+			<div class="mgt-20 pdl-30">
+				<p class="ellipsis txt-b3 mgb-0">{{item.payload.doc.data().description}}</p>
+				<h3 class="mgt-0 uppercase fs-20">{{item.payload.doc.data().name}}</h3>
+			</div>
+		</div>
+	</div>
+	<br>
+
+</ion-content>

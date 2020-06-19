@@ -1,0 +1,177 @@
+<!--<ion-toolbar>-->
+<!--  <ion-buttons slot="start">-->
+<!--    <ion-buttons>-->
+<!--      <ion-button (click)="closeModal()">-->
+<!--        <ion-icon src="assets/icons/x.svg"></ion-icon>-->
+<!--      </ion-button>-->
+<!--    </ion-buttons>-->
+<!--  </ion-buttons>-->
+<!--</ion-toolbar>-->
+
+<!--<ion-content scrollX="false" scrollY="false">-->
+<!--  <div class="content-wrapper">-->
+<!--    <div class="header no-border has-toolbar">-->
+<!--      <div class="title">-->
+<!--        {{ 'feed-comment-component.title' | translate }}-->
+<!--      </div>-->
+<!--      <div class="options">-->
+<!--        <ion-button fill="clear" size="small" color="medium" (click)="openSearch = !openSearch">-->
+<!--          <ion-icon mode="md" name="search"></ion-icon>-->
+<!--        </ion-button>-->
+<!--        <ion-button fill="clear" size="small" color="medium">-->
+<!--          <ion-icon mode="md" name="more"></ion-icon>-->
+<!--        </ion-button>-->
+<!--      </div>-->
+<!--    </div>-->
+
+<!--    <app-search-bar *ngIf="openSearch" (event)="onSearch($event)"></app-search-bar>-->
+
+<!--    <div class="wrapper">-->
+<!--      <div class="content-scroll" #content>-->
+<!--        <ng-container *ngIf="comments.length > 0">-->
+<!--          <div class="comment" *ngFor="let item of comments">-->
+<!--            <div class="image" [image-loader]="item?.user?.photoURL"></div>-->
+<!--            <div class="detail">-->
+<!--              <div class="user">-->
+<!--                <div class="name">{{ item?.user?.displayName }}</div>-->
+<!--                <div class="date">{{ item.updatedAt?.toDate() | amTimeAgo }}</div>-->
+<!--              </div>-->
+<!--              <div class="message">{{ item.text || 'feed-comment-component.no-comment' | translate }}</div>-->
+<!--            </div>-->
+<!--            <div class="options" *ngIf="item?.user?.uid === user.uid">-->
+<!--              <ion-icon color="medium" name="more" (click)="openOptions(item)"></ion-icon>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </ng-container>-->
+
+<!--        <app-no-data *ngIf="comments.length === 0"></app-no-data>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</ion-content>-->
+
+<!--<ion-footer>-->
+<!--  <ion-toolbar class="custom-form">-->
+<!--    <textarea-->
+<!--      elastic-textarea="50"-->
+<!--      name="message"-->
+<!--      placeholder="{{ 'feed-comment-component.placeholder' | translate }}"-->
+<!--      [(ngModel)]="commentMsg"-->
+<!--    ></textarea>-->
+
+<!--    <ion-buttons slot="end">-->
+<!--      <ion-button class="circle" fill="clear" color="primary" (click)="save(commentMsg)">-->
+<!--        <ion-icon src="assets/icons/send.svg"></ion-icon>-->
+<!--      </ion-button>-->
+<!--    </ion-buttons>-->
+<!--  </ion-toolbar>-->
+<!--</ion-footer>-->
+
+<ion-toolbar>
+    <ion-buttons slot="start">
+        <ion-buttons>
+            <ion-button (click)="closeModal()">
+                <ion-icon src="assets/icons/x.svg"></ion-icon>
+            </ion-button>
+            <ion-button fill="clear" size="small" color="medium" (click)="openSearch = !openSearch">
+                <ion-icon mode="md" name="search"></ion-icon>
+            </ion-button>
+            <ion-button fill="clear" size="small" color="medium">
+                <ion-icon mode="md" name="more"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+    </ion-buttons>
+</ion-toolbar>
+
+<ion-content scrollX="false" scrollY="false">
+    <app-spinner *ngIf="loading"></app-spinner>
+    <div class="content-wrapper">
+        <div class="header no-border has-toolbar">
+            <div class="title">
+                {{ 'feed-comment-component.title' | translate }}
+            </div>
+            <div class="options">
+
+            </div>
+        </div>
+
+        <app-search-bar *ngIf="openSearch" (event)="onSearch($event)"></app-search-bar>
+
+        <ng-container *ngIf="isVideoAvailable">
+            <div class="video-content">
+                <iframe [src]="post?.videoContent | youtube" height="100%" width="100%" frameborder="0"
+                        allowfullscreen></iframe>
+            </div>
+        </ng-container>
+
+        <ng-container *ngIf="post?.videoUrl">
+            <div class="video-content">
+                <video [src]="post?.videoUrl" height="100%" width="100%" controls></video>
+            </div>
+        </ng-container>
+
+        <ng-container *ngIf="isImageAvailable">
+
+            <div class="image-content" *ngIf="post.images && post.images.length > 0"
+                 [image-loader]="post.images[currentIndex]">
+                <div class="left" *ngIf="post.images && post.images.length > 1">
+                    <ion-icon mode="ios" name="arrow-back" (click)="back()"></ion-icon>
+                </div>
+                <div class="center" (click)="openImage(post)"></div>
+                <div class="right" *ngIf="post.images && post.images.length > 1">
+                    <ion-icon mode="ios" name="arrow-forward" (click)="forward()"></ion-icon>
+                </div>
+            </div>
+        </ng-container>
+
+        <div class="wrapper">
+            <div class="content-scroll" #content>
+                <ng-container *ngIf="comments.length > 0">
+                    <div class="comment" *ngFor="let item of comments ; let i= index; let last = last"
+                         [id]="last ? 'last-item' : 'item' + i">
+                        <div class="image" [image-loader]="item?.user?.photoURL"
+                             (click)="showImage(item?.user?.photoURL)"></div>
+                        <div class="detail">
+                            <div class="user" (click)="goToProfile(item?.user?.uid)">
+                                <div class="name">{{ item?.user?.displayName }}</div>
+                                <div class="date"
+                                     *ngIf="item.updatedAt">{{ item.updatedAt?.toDate() | amTimeAgo }}</div>
+                                <div class="date" *ngIf="!item.updatedAt">{{ newDate | amTimeAgo }}</div>
+                            </div>
+                            <div class="message">{{ item.text || 'feed-comment-component.no-comment' | translate }}</div>
+                        </div>
+                        <div class="options" *ngIf="item?.user?.uid === user.uid" style="position: relative">
+                            <ion-icon color="medium" name="more" (click)="openOptions(item, i)"></ion-icon>
+                        </div>
+
+                        <div class="options reply-option" style="position: relative">
+                            <ion-button class="reply-button" fill="clear" size="small" (click)="openReplies(item, i)">
+                                <ion-icon color="medium" name="redo"></ion-icon>
+                                <small class="reply-count">{{ item?.replies?.length ? item.replies.length : '' }}</small>
+                            </ion-button>
+                        </div>
+                    </div>
+
+                </ng-container>
+                <app-no-data *ngIf="comments.length === 0"></app-no-data>
+            </div>
+        </div>
+    </div>
+</ion-content>
+
+<ion-footer>
+   <ion-toolbar>
+   <textarea [(ngModel)]="commentMsg"
+             elastic-textarea="5"
+             (keyup)="keyUpMessage($event)"
+             placeholder="{{ 'feed-comment-component.placeholder' | translate }}"
+   ></textarea>
+
+       <ion-buttons slot="end">
+           <ion-button class="circle" fill="clear" color="primary" (click)="save()" [disabled]="!commentMsg">
+               <ion-icon src="assets/icons/send.svg"></ion-icon>
+           </ion-button>
+       </ion-buttons>
+   </ion-toolbar>
+</ion-footer>
+

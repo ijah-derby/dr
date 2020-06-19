@@ -1,0 +1,138 @@
+
+<ion-header>
+	<ion-toolbar>
+		<ion-buttons slot="start">
+			<ion-back-button class="fs-24 txt1" text="" icon="ios-arrow-round-back"></ion-back-button>
+		</ion-buttons>
+		<ion-title>Checkout</ion-title>
+	</ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+
+	<ion-row padding>
+		<h4>Complete the order</h4>
+		<p>You need to fill in and complete the<br>information below</p>
+	</ion-row>
+	<ion-list>
+		<ion-radio-group [(ngModel)]="pay_method">
+			<ion-item>
+				<ion-label>Payment on delivery</ion-label>
+				<ion-radio checked="true" value="1"></ion-radio>
+			</ion-item>
+
+			<ion-item>
+				<ion-label>Payment by credit card</ion-label>
+				<ion-radio value="2"></ion-radio>
+			</ion-item>
+
+			<ion-item>
+				<ion-label>Pay use Paypal</ion-label>
+				<ion-radio value="3"></ion-radio>
+			</ion-item>
+		</ion-radio-group>
+	</ion-list>
+
+	<ion-list>
+		<div *ngIf="pay_method==2">
+			<ion-item>
+				<ion-label stacked>Card Number</ion-label>
+				<ion-input [(ngModel)]="card_info.number" type="text"></ion-input>
+			</ion-item>
+
+			<ion-item>
+				<ion-label stacked>Exp Month</ion-label>
+				<ion-input [(ngModel)]="card_info.expMonth" type="text"></ion-input>
+			</ion-item>
+
+			<ion-item>
+				<ion-label stacked>Exp Year</ion-label>
+				<ion-input [(ngModel)]="card_info.expYear" type="text"></ion-input>
+			</ion-item>
+
+			<ion-item>
+				<ion-label stacked>CVC</ion-label>
+				<ion-input [(ngModel)]="card_info.cvc" type="text"></ion-input>
+			</ion-item>
+		</div>
+
+
+		<!-- <div *ngIf="user_id == null">
+			<ion-item>
+				<ion-label stacked>Full name</ion-label>
+				<ion-input [(ngModel)]="full_name" type="text"></ion-input>
+				<p padding class="err" *ngIf="full_name.length() < 5 || full_name.length() > 50">* More than 5 and less than 50 characters, do not contain special characters.</p>
+			</ion-item>
+
+			<ion-item>
+				<ion-label stacked>Phone</ion-label>
+				<ion-input type="number" [(ngModel)]="phone" type="text"></ion-input>
+				<p padding class="err" *ngIf="phone.length() < 10 || phone.length() > 50">* More than 10 and less than 50 digits.</p>
+			</ion-item>
+
+			<ion-item>
+				<ion-label stacked>Email</ion-label>
+				<ion-input type="text" [(ngModel)]="email" type="text"></ion-input>
+				<p padding class="err" *ngIf="email.length() < 10 || email.length() > 50">* More than 10 and less than 50 digits.</p>
+			</ion-item>
+		</div> -->
+	</ion-list>
+
+	<form padding (ngSubmit)="order()" [formGroup]="addressForm" *ngIf="user_id || user_id != null">
+		<ion-list>
+			<div padding>
+				<ion-label class="txt3">Receiving address</ion-label>
+				<ion-item>
+					<ion-input formControlName="address" type="text"></ion-input>
+				</ion-item>
+				<div text-right class="error-message" *ngIf="!addressForm.controls.address.valid && addressForm.controls.address.dirty">
+					<p class="fs-14 mgt-5 txt-danger">Please enter a valid address.</p>
+				</div>
+
+				<br>
+
+				<ion-label class="txt3">Message</ion-label>
+				<ion-item>
+					<ion-textarea formControlName="message"></ion-textarea>
+				</ion-item>
+			</div>
+		</ion-list>
+
+		<div class="payment" padding>
+			<p class="fee total-pay flex-row flex-ali-end">
+				<span class="uppercase fs-15 fw-600">Price:</span>
+				<span class="mgl-20 fs-20 fw-600 spacing1 flex-1" text-right *ngIf="currenciesProv">{{total_price}}</span>
+			</p>
+			<p class="fee total-pay flex-row flex-ali-end">
+				<span class="uppercase fs-15 fw-600">Tax:</span>
+				<span class="mgl-20 fs-20 fw-600 spacing1 flex-1" text-right *ngIf="currenciesProv">{{tax_pay}}</span>
+			</p>
+			<p class="fee total-pay flex-row flex-ali-end">
+				<span class="uppercase fs-15 fw-600">ship:</span>
+				<span class="mgl-20 fs-20 fw-600 spacing1 flex-1" text-right *ngIf="currenciesProv">{{shipfee_pay}}</span>
+			</p>
+
+			<p class="fee total-pay flex-row flex-ali-end">
+				<span class="uppercase fs-20 fw-600">Payment:</span>
+				<span class="mgl-20 fs-28 fw-600 spacing1 flex-1" text-right *ngIf="currenciesProv">{{total_pay}}</span>
+			</p>
+
+			<div class="err_show" *ngIf="!validate">
+				<p class="err txt-danger italic">Error! You must fill in the information again.</p>
+			</div>
+
+			<br><br>
+
+			<ion-button type="submit" shape="round" expand="block">
+				<ion-icon slot="start" name="card"></ion-icon>Complete the order
+			</ion-button>
+			
+			<!-- <ion-button type="button" class="mgt-15" shape="round" expand="block" href="/mycart" routerDirection="forward">
+				<ion-icon slot="start" name="close"></ion-icon>Cancel
+			</ion-button> -->
+		</div>
+	</form>
+
+
+
+</ion-content>

@@ -1,0 +1,102 @@
+<!--<ion-toolbar>-->
+<!--  <ion-buttons slot="start">-->
+<!--    <ion-menu-button size="small"-->
+<!--      autoHide="true"></ion-menu-button>-->
+<!--  </ion-buttons>-->
+<!--  <img alt="appicon" height="22" class="ion-float-right" src="assets/images/logo1.png"/>-->
+<!--</ion-toolbar>-->
+
+<!--<ion-content scrollY="false"-->
+<!--  scrollX="false">-->
+<!--  <div class="content-wrapper">-->
+<!--    <div class="header no-border has-toolbar" style="position: relative;">-->
+<!--      <div class="title" style="position: relative; top: 5px;">-->
+<!--        {{'dashboard-component.title' | translate}}-->
+<!--      </div>-->
+<!--      <div class="noti-icon" (click)="goToMessages()">-->
+<!--        <ion-icon name="chatbubbles" slot="end" style="width: 30px; height: 50px;"></ion-icon>-->
+<!--        <ion-badge *ngIf="counter > 0" color="green">{{ counter }}</ion-badge>-->
+<!--      </div>-->
+<!--    </div>-->
+
+<!--    <app-tab-menu [tabs]="views"></app-tab-menu>-->
+<!--    <div class="content-scroll">-->
+<!--      <router-outlet></router-outlet>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</ion-content>-->
+
+<!--<ion-toolbar color="favorite">-->
+<!--  <ion-buttons slot="start">-->
+<!--    <ion-menu-button color="medium" size="small" autoHide="true"></ion-menu-button>-->
+<!--    <ion-button small color="medium" fill="clear" class="noti-icon" (click)="goToMessages()">-->
+<!--      <ion-icon name="ios-mail" slot="end" style="width: 30px; height: 25px; margin-top: 1px"></ion-icon>-->
+<!--      <ion-badge *ngIf="counter > 0" class="badgemsg" style="margin-bottom: 7px" color="green">{{ counter }}</ion-badge>-->
+<!--    </ion-button>-->
+
+<!--    <ion-button color="medium" fill="clear" class="noti-messageicon" (click)="goToNotifications()">-->
+<!--      <ion-icon name="ios-notifications" slot="end" size="small" style="width: 27px; height: 25px; margin-top: 7px;margin-right: 0px;"></ion-icon>-->
+<!--      <ion-badge *ngIf="notificationCounter > 0" class="badge" style="right: 10%" color="green">{{ notificationCounter }}</ion-badge>-->
+<!--    </ion-button>-->
+<!--  </ion-buttons>-->
+<!--  <ion-buttons slot="end">-->
+<!--    <img alt="appicon" height="22" class="ion-float-right" src="assets/images/logo1.png"/>-->
+<!--  </ion-buttons>-->
+<!--</ion-toolbar>-->
+
+<ion-toolbar color="favorite">
+  <ion-buttons slot="start">
+    <!-- <ion-menu-button menu="first" color="medium" size="small" autoHide="true"></ion-menu-button> -->
+    <ion-icon name="menu" style="font-size: 25px;padding-left: 10px;color: black;" (click)="openMenu()"></ion-icon>
+
+
+  </ion-buttons>
+  <ion-buttons slot="end">
+    <img id="hide" alt="appicon" height="22" class="ion-float-right" src="assets/images/logo1.png"/>
+  </ion-buttons>
+</ion-toolbar>
+<ion-content scrollX="false">
+  <div class="content-wrapper"> 
+    <app-tab-menu [tabs]="views" style="padding: 0;"></app-tab-menu>
+    <div class="content-scroll">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+
+
+    <ion-menu-button class="writer" menu="second" autoHide="true">
+  <img  alt="appicon" src="assets/images/pull.png"/>
+</ion-menu-button>
+
+
+<app-spinner *ngIf="loading"></app-spinner>
+ 
+</ion-content>
+ 
+ <ion-toolbar class="cont">
+
+ <ion-button fill="clear" routerLink="/feed" routerDirection="forward">
+           <ion-icon name="home" style="width: 30px; height: 50px; margin-left: 0px; padding:12px;"></ion-icon>
+      </ion-button>
+
+
+      <ion-button  fill="clear" routerLink="/profile" routerDirection="forward">
+           <ion-icon name="person" style="width: 28px; height: 50px; margin-right: 0px; padding:12px;"></ion-icon>
+      </ion-button>
+
+      <ion-button fill="clear" (click)="goToMessages()">
+        <ion-icon name="ios-mail" style="width: 30px; height: 50px; padding:12px; margin-left: 0px;"></ion-icon>
+         <ion-badge *ngIf="counter > 0" class="badgemsg" style="margin-bottom: 7px;right: 20px;" color="green">{{ counter }}</ion-badge>
+      </ion-button>
+  
+      <ion-button fill="clear" (click)="goToNotifications()">
+        <ion-icon name="ios-notifications" style="width: 30px; height: 50px; padding:12px;"></ion-icon>
+         <ion-badge *ngIf="notificationCounter > 0" class="badge" style="right: 22%; bottom: 15px;" color="green">{{ notificationCounter }}</ion-badge>
+      </ion-button>
+
+      
+    
+  </ion-toolbar>
+
+
+

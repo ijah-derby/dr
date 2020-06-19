@@ -1,0 +1,70 @@
+<ion-header>
+	<ion-toolbar>
+		<ion-buttons slot="start">
+			<ion-back-button class="fs-24 txt1" text="" icon="ios-arrow-round-back"></ion-back-button>
+			
+			<ion-menu-button>
+				<ion-icon class="fs-24 txt1" name="arrow-round-forward"></ion-icon>
+			</ion-menu-button>
+		</ion-buttons>
+
+		<ion-buttons slot="end">
+			<ion-button fill="clear" class="shadow-0 txt1" [routerLink]="'/mycart'" routerDirection="forward">
+				<ion-icon name="cart"></ion-icon>
+			</ion-button>
+		</ion-buttons>
+
+		<ion-title>Search</ion-title>
+	</ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+
+	<ion-searchbar (ionInput)="getItems($event)"></ion-searchbar>
+	<div padding class="">
+		<div class="list-prd-list" *ngIf="list_search && list_search.length > 0">
+			<div class="item-prd mgb-20 pdb-15" *ngFor="let item of list_search">
+				<div class="thumb mgr-10 flex-row flex-ali-center flex-jus-center" [routerLink]="['/detail', {id_item: item.payload.doc.id}]">
+					<img src="{{item.payload.doc.data().thumb}}">
+				</div>
+				<div class="">
+					<div class="ovfl-hidden" [routerLink]="['/detail', {id_item: item.payload.doc.id}]">
+						<h4 class="fs-14 txt1 fw-600 ellipsis mg-0">{{item.payload.doc.data().name}}</h4>
+						<p class="mg-0">
+							<span class="ellipsis fs-14 txt3 mg-0 line-through mgr-10 fw-600" *ngIf="currenciesProv && item.payload.doc.data().discount > 0">
+								<i *ngIf="currenciesProv">
+									{{currenciesProv.formatMoney(item.payload.doc.data().price)}}
+								</i>
+							</span>
+							<span class="ellipsis fs-14 txt1 mg-0 fw-600" *ngIf="currenciesProv && item.payload.doc.data().discount > 0">
+								{{currenciesProv.formatMoney(item.payload.doc.data().price - item.payload.doc.data().price*item.payload.doc.data().discount/100)}}
+							</span>
+							<span class="ellipsis fs-14 txt1 mg-0 fw-600" *ngIf="currenciesProv && item.payload.doc.data().discount == 0">
+								{{currenciesProv.formatMoney(item.payload.doc.data().price - item.payload.doc.data().price*item.payload.doc.data().discount/100)}}
+							</span>
+						</p>
+					</div>
+					<div class="mgt-5">
+						<ion-button size="small" (click)="addCart(item)" class="fs-11 bdra-0 fw-600">
+							<ion-icon name="ios-cart"></ion-icon>
+							Add cart
+						</ion-button>
+						<ion-button size="small" color="primary" class="fs-11 bdra-0" *ngIf="favo_str.search(item.payload.doc.id) > -1" (click)="favorites(item)">
+							<ion-icon name="ios-heart"></ion-icon>
+						</ion-button>
+						<ion-button size="small" color="dark" class="fs-11 bdra-0" *ngIf="favo_str.search(item.payload.doc.id) < 0" (click)="favorites(item)">
+							<ion-icon name="ios-heart"></ion-icon>
+						</ion-button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<br>
+	
+	<ion-infinite-scroll (ionInfinite)="loadMore($event)">
+		<ion-infinite-scroll-content></ion-infinite-scroll-content>
+	</ion-infinite-scroll>
+
+</ion-content>

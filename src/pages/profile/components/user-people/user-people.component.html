@@ -1,0 +1,37 @@
+<div *ngFor="let item of friends">
+  <app-simple-item *ngIf="item.displayName">
+    <div class="img" prefix [image-loader]="item.photoURL" (click)="openProfile(item.uid)"></div>
+    <div class="detail" (click)="openProfile(item.uid)">
+      <div class="name">{{ item.displayName }}</div>
+      <div class="city" *ngIf="item.town">{{ item.town }}</div>
+      <div class="country" *ngIf="item.country">{{ item.country }}</div>
+    </div>
+  
+    <!-- show if not following -->
+    <!-- <ion-button suffix size="small" *ngIf="following && !isFriend(item.uid)" class="follow" (click)="manage()">{{
+      'person-component.follow' | translate
+    }}</ion-button> -->
+  
+    <!-- call user with hidden a tag -->
+    <a hidden #callNumber href="tel:+{{ item.mobile || item.phone }}"></a>
+  </app-simple-item>
+
+  <app-simple-item *ngIf="!item.displayName">
+    <div class="img" prefix [image-loader]="" (click)="showMsg()"></div>
+    <div class="detail" (click)="showMsg()">
+      <div class="name" style="color: red;">Deleted User</div>
+      <div class="city" *ngIf="item.town"></div>
+      <div class="country" *ngIf="item.country"></div>
+    </div>
+  
+    <!-- show if not following -->
+    <!-- <ion-button suffix size="small" *ngIf="following && !isFriend(item.uid)" class="follow" (click)="manage()">{{
+      'person-component.follow' | translate
+    }}</ion-button> -->
+  
+    <!-- call user with hidden a tag -->
+    <a hidden #callNumber href="tel:+"></a>
+  </app-simple-item>
+</div>
+<app-spinner *ngIf="loading"></app-spinner>
+<app-no-data *ngIf="friends.length === 0"></app-no-data>
