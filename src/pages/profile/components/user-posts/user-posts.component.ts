@@ -38,7 +38,7 @@ export class UserPostsComponent extends Extender implements OnInit {
     const { uid } = await this.authService.getUser();
     // this.loading = true;
     // this.subscriptions.push(
-    //  this.doReload();
+     this.doReload();
     // );
   }
 
@@ -48,7 +48,7 @@ export class UserPostsComponent extends Extender implements OnInit {
 
   public test() {
     setTimeout(() => {
-      // this.doReload();
+      this.doReload();
     }, 700);
   }
 
