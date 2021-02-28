@@ -1,0 +1,51 @@
+
+.system-msg{
+    text-align:center;
+    color:#ccc;
+    font-size: 14px;
+}
+
+ion-textarea{
+    font-size: 14px;
+    resize: both;
+    border-radius: 4px;
+    border: 2px solid #eee;
+    padding: 0px 8px;
+}
+
+.msg-header {
+    text-align: left;
+    border-bottom: 1px dashed lightgray;
+    padding-bottom: 12px;
+
+    img {
+        width: 30px;
+        height: 30px;
+        object-fit: cover;
+        float: left;
+        margin-right: 10px;
+        border-radius: 50%;
+    }
+    .msg-name {
+        margin: 0;
+        display: inline;
+        font-weight: 600;
+        position: relative;
+        top: 2px;
+        font-size: 13px;
+    }
+}
+
+.system {
+    width: 100% !important;
+    text-align: center !important;
+    font-size: 12px !important;
+    color: gray !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    border: 0 !important;
+}
+
+.left {
+    border: 2px solid #eee !important;
+}

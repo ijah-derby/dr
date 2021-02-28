@@ -1,4 +1,4 @@
-<ion-toolbar>
+<ion-toolbar class="tool">
   <ion-buttons slot="start">
     <ion-back-button style="color: black;"></ion-back-button>
     <ion-menu-button size="small"
@@ -11,10 +11,16 @@
   scrollY="false">
   <div class="content-wrapper">
     <div class="header no-border has-toolbar">
-      <div class="title">
-        {{'setting-component.title' | translate}}
-      </div>
+    
     </div>
+   <h2 class="margin">Settings</h2> 
+    <ion-button 
+    class="update2"
+   color="medium"
+    (click)="openUpdate()">
+    <ion-label class="update" color="favorite" text-uppercase>Update app - </ion-label>
+    <ion-icon class="iconupdate" color="google" name="appstore"></ion-icon>
+  </ion-button>
 
     <div class="wrapper"
       *ngIf="currentUser">
@@ -43,13 +49,13 @@
           </app-panel>
         </app-accordion>
 
-        <ion-button expand="block"
+        <ion-button
           shape="round"
           (click)="save()">
           {{'setting-component.save-button' | translate}}
         </ion-button>
 
-        <ion-button expand="block"
+        <ion-button
           shape="round"
           color="danger"
           (click)="signOut()">

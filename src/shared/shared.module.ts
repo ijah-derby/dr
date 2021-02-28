@@ -38,6 +38,12 @@ import {YoutubePipe} from './pipes/youtube/youtube.pipe';
 import {PersonComponent} from "../pages/people/components/person/person.component";
 import { FeedReplyComponent } from 'src/pages/feed/components/feed-reply/feed-reply.component';
 import { MinimalComponent } from './card-views/minimal/minimal.component';
+import { FeedAddComponent } from 'src/pages/feed/components/feed-add/feed-add.component';
+import { ConversationPipe } from 'src/app/pipes/conversation.pipe';
+import { DateFormatPipe } from 'src/app/pipes/date.pipe';
+import { FriendPipe } from 'src/app/pipes/friend.pipe';
+import { GroupPipe } from 'src/app/pipes/group.pipe';
+import { ImageModalComponent } from 'src/app/components/image-modal/image-modal.component';
 
 const COMPONENTS: any[] = [MinimalComponent,TabMenuComponent, NoDataComponent, SearchBarComponent, SpinnerComponent, SimpleItemComponent, RatingComponent];
 
@@ -60,12 +66,14 @@ const MODALS: any[] = [
   FeedDetailComponent,
   FeedCommentComponent,
   FeedReplyComponent,
-  PersonComponent
+  PersonComponent,
+  FeedAddComponent,
+  ImageModalComponent
 ];
 
 const DIRECTIVES: any[] = [ImageLoaderDirective, ElasticDirective, ColorLuminanceDirective];
 
-const PIPES: any[] = [MarkdownPipe, YoutubePipe];
+const PIPES: any[] = [MarkdownPipe, YoutubePipe, ConversationPipe, DateFormatPipe, FriendPipe, GroupPipe];
 
 const MODULES = [
   CommonModule,

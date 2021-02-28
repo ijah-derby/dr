@@ -1,0 +1,16 @@
+<ion-content fullscreen>
+   <img id="hide" alt="appicon" height="22" class="ion-float-right" src="assets/images/logo1.png"/>
+  <ion-item class="close-fake" lines="none" text-center>
+    <ion-button class="close" (click)="close()" fill="clear" color="dark">
+      <ion-icon name="close" slot="start"></ion-icon>
+      
+    </ion-button>
+  </ion-item>
+  <ion-slides [options]="sliderOpts">
+    <ion-slide>
+      <div class="swiper-zoom-container">
+        <img [src]="img" />
+      </div>
+    </ion-slide>
+  </ion-slides>
+</ion-content>

@@ -16,6 +16,10 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { File } from '@ionic-native/file/ngx';
 import { WebView } from '@ionic-native/ionic-webview/ngx';
 import { Base64 } from '@ionic-native/base64/ngx';
+import { SpinnerDialog } from '@ionic-native/spinner-dialog/ngx';
+import { ThemeableBrowser } from '@ionic-native/themeable-browser/ngx';
+
+
 
 
 
@@ -36,8 +40,16 @@ import { UploadProvider } from 'src/pages/Shopping/providers/upload';
 import { FcmProvider } from 'src/pages/Shopping/providers/fcm';
 import { FavoritesProvider } from 'src/pages/Shopping/providers/favorites';
 import { ThemeProvider } from 'src/pages/Shopping/providers/theme';
+import { MediaCapture } from '@ionic-native/media-capture/ngx';
+
+
+
+
+
 
 export const NativeImports = [
+  SpinnerDialog,
+  ThemeableBrowser,
   StatusBar,
   SplashScreen,
   Facebook,
@@ -74,4 +86,5 @@ export const NativeImports = [
   Camera,
   AdMobFree,
   File,
+  MediaCapture
 ];

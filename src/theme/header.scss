@@ -8,7 +8,7 @@
     border-bottom: 1px solid var(--ion-color-light-shade);
 
     &.no-border {
-      border-bottom: none;
+      border-bottom: 2px;
     }
 
     &.has-toolbar {
@@ -34,8 +34,8 @@
       justify-content: flex-end;
       flex: 1;
 
-      .button {
-      }
+       
+      
     }
   }
   .content-scroll {

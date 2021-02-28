@@ -1,0 +1,96 @@
+<ion-header>
+	<ion-toolbar>
+		<ion-buttons slot="start">
+			<ion-menu-button menu="shop">
+				<ion-icon class="fs-24 txt1" name="ios-arrow-round-forward"></ion-icon>
+			</ion-menu-button>
+		</ion-buttons>
+
+		<ion-title>Profile</ion-title>
+	</ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+
+	<div text-center class="top-profile">
+		<div text-right>
+			<ion-button fill="clear" class="fs-16" (click)="logout()">
+				<ion-icon name="md-log-out"></ion-icon>logout
+			</ion-button>
+		</div>
+		<br>
+		<br>
+		<div class="thumb-avt flex-row flex-ali-center flex-jus-center" *ngIf="user != null || user">
+			<img src="{{(user.avt != '' && user.avt != null)? user.avt : 'assets/imgs/no-avt.png' }}">
+		</div>
+		<ion-button size="small" (click)="pickImage()" class="bdra-30 btn-edit mgt--15 mgl-50 shadow-3">
+			<ion-icon name="create"></ion-icon>
+		</ion-button>
+		<h2 class="spacing-1 fs-20 fw-600" *ngIf="user != null || user">{{user.username}}</h2>
+	</div>
+
+	<br>
+	<br>
+	
+	<form padding (ngSubmit)="updateAddress()" [formGroup]="addressForm" *ngIf="user || user != null">
+		<ion-label class="pdl-15 txt-b3">Email</ion-label>
+		<ion-item>
+			<ion-input disabled value={{user.email}} type="text"></ion-input>
+		</ion-item>
+
+		<br>
+
+		<ion-label class="pdl-15 txt-b3">Username</ion-label>
+		<ion-item>
+			<ion-input formControlName="username" type="text"></ion-input>
+		</ion-item>
+
+		<br>
+
+		<ion-label class="pdl-15 txt-b3">Full name</ion-label>
+		<ion-item>
+			<ion-input formControlName="fullname" type="text"></ion-input>
+		</ion-item>
+
+		<br>
+
+		<ion-label class="pdl-15 txt-b3">Address</ion-label>
+		<ion-item>
+			<ion-input formControlName="address" type="text"></ion-input>
+		</ion-item>
+
+		<br>
+
+		<ion-label class="pdl-15 txt-b3">Phone</ion-label>
+		<ion-item>
+			<ion-input formControlName="phone" type="numbber"></ion-input>
+		</ion-item>
+
+		<br>
+		<br>
+
+		<div class="" text-center>
+			<ion-button shape="round" type="submit" class="">
+				Save change
+			</ion-button>
+		</div>
+
+		<br>
+		<br>
+		<br>
+	</form>
+
+
+	<div class="" text-center>
+		<ion-button fill="clear" [routerLink]="'/forgot'" class="">
+			Reset Password
+		</ion-button>
+	</div>
+
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+
+</ion-content>

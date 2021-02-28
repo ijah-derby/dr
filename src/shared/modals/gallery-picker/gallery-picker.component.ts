@@ -1,6 +1,6 @@
 import { Component, Injector, OnInit } from '@angular/core';
 import { SocialSharing } from '@ionic-native/social-sharing/ngx';
-import { NavParams } from '@ionic/angular';
+import { NavParams, ToastController } from '@ionic/angular';
 import { isArray } from 'util';
 import {Extender} from '../../helpers/extender';
 
@@ -15,7 +15,11 @@ export class GalleryPickerComponent extends Extender implements OnInit {
   public textMsg: string = null;
   public selectedImageIndex: number = 0;
 
-  constructor(protected injector: Injector, private navParams: NavParams, private socialShare: SocialSharing) {
+  constructor(
+    protected injector: Injector, 
+    private navParams: NavParams, 
+    private socialShare: SocialSharing,
+  ) {
     super(injector);
   }
 
@@ -32,6 +36,11 @@ export class GalleryPickerComponent extends Extender implements OnInit {
       images,
       text
     };
+
+    if(!text) {
+      this.toast('Please type some message');
+      return;
+    }
 
     this.closeModal(data);
   }

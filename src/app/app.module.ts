@@ -2,6 +2,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuthModule } from '@angular/fire/auth';
+import { AngularFireDatabaseModule } from '@angular/fire/database';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { AngularFireMessagingModule } from '@angular/fire/messaging';
 import { AngularFireStorageModule } from '@angular/fire/storage';
@@ -16,6 +17,9 @@ import {NativeImports} from '../shared/helpers/native';
 import {SharedModule} from '../shared/shared.module';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './components/app.component';
+import { FriendPipe } from './pipes/friend.pipe';
+import { PipesPipe } from './pipes.pipe';
+import { GroupPipe } from './pipes/group.pipe';
 
 /**
  * bootstrap app component and add all the modules required in this app
@@ -49,6 +53,7 @@ import { AppComponent } from './components/app.component';
     AppRoutingModule,
     SharedModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
+    AngularFireDatabaseModule,
     AngularFireAuthModule,
     AngularFireMessagingModule,
     AngularFirestoreModule,

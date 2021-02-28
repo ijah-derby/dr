@@ -29,97 +29,160 @@
 <!--  </ion-buttons>-->
 <!--</ion-toolbar>-->
 
-<ion-toolbar color="favorite">
-    <ion-buttons slot="start">
-      <ion-icon name="menu" style="font-size: 25px;padding-left: 10px;color: black;" (click)="openMenu()"></ion-icon>
-        <!-- <ion-menu-button color="medium" size="small" autoHide="true"></ion-menu-button> -->
-        <!-- <ion-icon name="trash" (click)="load()"></ion-icon> -->
-        <ion-icon name="cart" class="cart-icon" (click)="goToShop()"></ion-icon>
-    </ion-buttons>
-     <ion-buttons slot="end">
-        <img id="hide" alt="appicon" height="22"
-             class="ion-float-right" src="assets/images/logo1.png"/>
-    </ion-buttons>
+
+ 
+
+<ion-toolbar class="tool" color="favorite">
+  <ion-buttons slot="start">
+    <ion-icon
+    src="assets/icons/menu-outline.svg"
+    color="danger"
+      style="font-size: 25px; padding-left: 10px; color: black;"
+      (click)="openMenu()"
+    ></ion-icon>
+    <!-- <ion-menu-button color="medium" size="small" autoHide="true"></ion-menu-button> -->
+    <!-- <ion-icon name="trash" (click)="load()"></ion-icon> -->
+    <!-- <ion-icon name="cart" class="cart-icon" (click)="goToShop()"></ion-icon> -->
+    <ion-button
+    fill="clear"
+   (click)="openShop()">
+    <ion-icon src="assets/icons/cart-outline.svg" color="medium" class="cart" mode="md"></ion-icon>
+  </ion-button>
+
+  <ion-button
+  fill="clear"
+  routerLink="/browser" routerDirection="backward">
+  <ion-icon src="assets/icons/book-outline.svg" color="medium" class="knowledge" mode="md"></ion-icon>
+</ion-button>
+
+
+  <ion-menu-button class="headphones" menu="second" autoHide="true">
+    <ion-icon src="assets/icons/play-outline.svg" color="medium"></ion-icon>
+  </ion-menu-button>
+  
+  </ion-buttons>
+
+
+
+
    
-</ion-toolbar>
-  <ion-menu-button class="writer" menu="second" autoHide="true">
-  <img  alt="appicon" src="assets/images/pull.png"/>
-</ion-menu-button>
-
-<ion-content>
-
   
  
-  <ion-icon class="down" name="md-arrow-dropdown" style="width: 28px; height: 20px;"></ion-icon>
-
-    <ion-refresher
-            slot="fixed"
-            pullFactor="0.5"
-            pullMin="100"
-            pullMax="200"
-            (ionRefresh)="doRefreshTop($event)">
-        <ion-refresher-content
-                pullingIcon="arrow-dropdown"
-                pullingText="Pull to refresh"
-                refreshingSpinner="circles"
-                refreshingText="Refreshing...">
-        </ion-refresher-content>
-    </ion-refresher>
-
-    <app-spinner *ngIf="loading"></app-spinner>
-    <div *ngFor="let item of feed; let i = index">
-        <feed-minimal *ngIf="item && item.user && item.user.displayName"
-        [feed]="item"
-        [itemIndex]="i"
-        (event)="manage($event)">
-        </feed-minimal>
-    </div>
-    <ion-infinite-scroll threshold="100px" (ionInfinite)="loadMoreFeed($event)">
-        <ion-infinite-scroll-content
-                loadingSpinner="bubbles"
-                loadingText="Loading more...">
-        </ion-infinite-scroll-content>
-    </ion-infinite-scroll>
-
-
-</ion-content>
-
-
-
-
-<ion-toolbar color="favorite">
-    <ion-tabs>
-        <ion-tab-bar slot="bottom">
-            <ion-tab-button routerLink="/profile" routerDirection="forward">
-                <ion-icon name="person" style="width: 28px; height: 50px;"></ion-icon>
-            </ion-tab-button>
-
-
-            <ion-tab-button routerLink="/people" routerDirection="forward">
-                <ion-icon name="ios-people" style="width: 35px; height: 50px;"></ion-icon>
-            </ion-tab-button>
-
-            <ion-tab-button (click)="addPost()">
-                <ion-icon name="add-circle" style="width: 30px; height: 50px;"></ion-icon>
-            </ion-tab-button>
-
-            <ion-tab-button (click)="goToMessages()">
-                <ion-icon name="ios-mail" style="width: 30px; height: 50px;"></ion-icon>
-                <ion-badge *ngIf="messageCounter > 0" class="badgemsg" style="margin-bottom: 7px"
-                           color="green">{{ messageCounter }}</ion-badge>
-            </ion-tab-button>
-
-            <ion-tab-button (click)="goToNotifications()">
-                <ion-icon name="ios-notifications" style="width: 30px; height: 50px;"></ion-icon>
-                <ion-badge *ngIf="notificationCounter > 0" class="badge" style="right: 10%"
-                           color="green">{{ notificationCounter }}</ion-badge>
-            </ion-tab-button>
-
-
-        </ion-tab-bar>
-    </ion-tabs>
+  <ion-buttons slot="end">
+   
+    <img
+      id="hide"
+      alt="appicon"
+      height="22"
+      class="ion-float-right"
+      src="assets/images/logo1.png"
+    />
+  </ion-buttons>
 </ion-toolbar>
 
+<app-search-bar *ngIf="openSearch" (event)="onSearch($event)"></app-search-bar> 
+
+  
+<ion-content>
+
+    <!-- fab placed in the center of the content with a list on each side -->
+  
+  
+  
+  
+  <ion-icon
+    class="down"
+    name="md-arrow-dropdown"
+    style="width: 28px; height: 20px;"
+  ></ion-icon>
+
+  <ion-refresher
+    slot="fixed"
+    pullFactor="0.5"
+    pullMin="100"
+    pullMax="200"
+    (ionRefresh)="doRefreshTop($event)"
+  >
+    <ion-refresher-content
+      pullingIcon="arrow-dropdown"
+      pullingText="Pull to refresh"
+      refreshingSpinner="circles"
+      refreshingText="Refreshing..."
+    >
+    </ion-refresher-content>
+  </ion-refresher>
+
+  <app-spinner *ngIf="loading"></app-spinner>
+  <div *ngFor="let item of feed; let i = index">
+    <feed-minimal
+      *ngIf="item && item.user && item.user.displayName"
+      [feed]="item"
+      [itemIndex]="i"
+      (event)="manage($event)"
+    >
+    </feed-minimal>
+  </div>
+  <ion-infinite-scroll threshold="100px" (ionInfinite)="loadMoreFeed($event)">
+    <ion-infinite-scroll-content
+      loadingSpinner="bubbles"
+      loadingText=""
+    >
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+ 
+</ion-content>
+
+<ion-toolbar color="secondary">
+  <ion-tabs>
+    <ion-tab-bar color="favorite" slot="bottom">
+      <ion-tab-button routerLink="/profile" routerDirection="forward">
+        <ion-icon  src="assets/icons/person-outline.svg" color="primary" style="width: 30px; height: 50px;"></ion-icon>
+      </ion-tab-button>
+
+      <ion-tab-button routerLink="/people" routerDirection="forward">
+        <ion-icon
+        src="assets/icons/people-outline.svg"
+        color="primary"
+          style="width: 35px; height: 50px;"
+        ></ion-icon>
+      </ion-tab-button>
+
+      <ion-tab-button (click)="addPost()">
+        <ion-icon
+        src="assets/icons/add-circle-outline.svg"
+        color="primary" 
+          style="width: 30px; height: 50px;"
+        ></ion-icon>
+      </ion-tab-button>
+
+      <ion-tab-button (click)="goToMessages()">
+        <ion-icon src="assets/icons/mail-outline.svg" color="primary" style="width: 30px; height: 50px;"></ion-icon>
+        <ion-badge
+          *ngIf="messagesService.getUnreadMessagesCount() > 0 || messagesService.getUnreadGroupMessagesCount() > 0"
+          class="badgemsg"
+          style="margin-bottom: 7px;"
+          color="green"
+          >{{ messagesService.getUnreadMessagesCount() + messagesService.getUnreadGroupMessagesCount() }}</ion-badge>
+      </ion-tab-button>
+
+      <ion-tab-button (click)="goToNotifications()">
+        <ion-icon
+        color="primary"
+        src="assets/icons/notifications-outline.svg"
+          style="width: 30px; height: 50px;"
+        ></ion-icon>
+        <ion-badge
+          *ngIf="notificationService.unreadCounter > 0"
+          class="badge"
+          style="right: 10%;"
+          color="green"
+          >{{ notificationService.unreadCounter }}</ion-badge
+        >
+      </ion-tab-button>
+    </ion-tab-bar>
+  </ion-tabs>
+</ion-toolbar>
 
 <!--<ion-content>-->
 
@@ -191,5 +254,3 @@
 <!--&lt;!&ndash;    </div>&ndash;&gt;-->
 <!--&lt;!&ndash;  </div>&ndash;&gt;-->
 <!--</ion-content>-->
-
-

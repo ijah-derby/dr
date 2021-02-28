@@ -2,10 +2,10 @@
   <ion-split-pane contentId="main-content">
     <ion-menu class="small" menuId="first" type="overlay" contentId="main-content">
       <ion-header>
-        <ion-toolbar color="danger">
-          <ion-title>{{ 'app-component.menu' | translate }}</ion-title>
-        </ion-toolbar>
+       
+    
       </ion-header>
+      
       <ion-content class="custom">
         <ion-list
                 class="menu"
@@ -26,14 +26,20 @@
             >
               <ion-icon *ngIf="!page.image" src="../assets/icons/{{ page.icon }}.svg"></ion-icon>
               <div class="image" *ngIf="page.image" [image-loader]="page.icon"></div>
-            </div>
+            </div> 
+              
           </ion-menu-toggle>
         </ion-list>
+        <ion-button 
+        fill="clear"
+       (click)="openDuck()">
+        <ion-icon style="font-size: 28px; margin-left: 20px; margin-top: 12px;" name="md-globe" color="medium" class="cart" mode="md"></ion-icon>
+      </ion-button>
       </ion-content>
     </ion-menu>
     <ion-menu class="full" menuId="second" contentId="main-content" side="end" type="overlay">
       <ion-header>
-        <ion-toolbar color="favorite">
+        <ion-toolbar class="tool" color="favorite">
           <ion-menu-button class="ion-float-left" menu="second" autoHide="true">
             <ion-icon color="medium" name="ios-arrow-back"></ion-icon>
           </ion-menu-button>

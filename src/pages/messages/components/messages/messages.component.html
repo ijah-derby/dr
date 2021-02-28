@@ -1,110 +1,175 @@
-<ion-toolbar>
-  <ion-buttons slot="start">
-    <ion-menu-button size="small" autoHide="true"></ion-menu-button>
-  </ion-buttons>
-  <img id="hide" alt="appicon" height="22" class="ion-float-right" src="assets/images/logo1.png"/>
-</ion-toolbar>
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-icon
+      src="assets/icons/menu-outline.svg"
+      color="danger"
+        style="font-size: 25px; padding-left: 10px; color: black;"
+        (click)="openMenu()"
+      ></ion-icon>
+    </ion-buttons>
+    <ion-title>Chats</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="createGroup()">Create Group</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
 
-<ion-content scrollX="false" scrollY="false">
-  <div class="content-wrapper">
-    <!-- start header -->
-    <div class="header no-border has-toolbar">
-      <div class="title">
-        {{ 'messages-component.title' | translate }}
-      </div>
-      <div class="options">
-        <ion-button fill="clear" size="small" color="medium" (click)="openSearch = !openSearch">
-          <ion-icon mode="md" name="search"></ion-icon>
-        </ion-button>
-        <ion-button fill="clear" size="small" color="medium" (click)="messagesOptions()">
-          <ion-icon mode="md" name="ios-settings"></ion-icon>
-        </ion-button>
-      </div>
+  <ion-segment [(ngModel)]="tab" (ionChange)="segmentChanged($event)">
+    <ion-segment-button value="chat">
+      <ion-label>Chats</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="group">
+      <ion-label>Groups <ion-badge color="danger" *ngIf="messagesService.getUnreadGroupMessagesCount() > 0">{{messagesService.getUnreadGroupMessagesCount()}}</ion-badge></ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+
+  <ng-container *ngIf="tab === 'chat'">
+    <ion-searchbar [(ngModel)]="searchFriend" placeholder="search.."></ion-searchbar>
+    <div class="empty-list" *ngIf="messagesService.conversations && messagesService.conversations.length <= 0">
+      <h1>
+        <ion-icon name="chatbubbles"></ion-icon>
+      </h1>
+      <p>No new conversation yet.</p>
     </div>
-    <!-- end header -->
-
-    <app-tab-menu [tabs]="views"></app-tab-menu>
-    <app-search-bar *ngIf="openSearch" (event)="onSearch($event)"></app-search-bar>
-
-    <!-- show messages -->
-    <div class="content-scroll" *ngIf="messages.length > 0">
-      <div class="messages" *ngFor="let item of messages">
-        <!-- selected icon toggle -->
-        <div class="action" *ngIf="getSelection">
-          <ion-icon
-            color="secondary"
-            (click)="item.selected = !item.selected"
-            [src]="item.selected ? 'assets/icons/check-square.svg' : 'assets/icons/square.svg'"
-          ></ion-icon>
-        </div>
-
-        <!-- image of receipeint -->
-        <div
-          class="image"
-          [image-loader]="getSender(item).photoURL"
-          (click)="goto(routes.people, { queryParams: { id: getSender(item).uid } })"
-        ></div>
-
-        <!-- details of chat -->
-        <div class="detail" (click)="openChat(item.id)">
-          <div class="name">{{ getSender(item).displayName }}</div>
-          <div class="msg">{{ getLastMessage(item)?.value || 'messages-component.start-chatting' | translate }}</div>
-        </div>
-
-        <!--  date and actions button -->
-        <div class="date">
-          <span>{{ item?.updatedAt?.toDate() | amTimeAgo }}</span>
-          <ion-badge *ngIf = "getCounter(item) > 0" color="green">{{ getCounter(item) }}</ion-badge>
-          <ion-button fill="clear" *ngIf="!getSelection" (click)="options(item)" color="medium" size="small">
-            <ion-icon name="more"></ion-icon>
-          </ion-button>
-        </div>
+    <!-- Show conversations -->
+  
+    <ion-list lines="none" *ngIf="messagesService.isLoading">
+      <ion-item *ngFor="let x of [].constructor(4)">
+        <ion-avatar slot="start">
+          <ion-skeleton-text animated></ion-skeleton-text>
+        </ion-avatar>
+        <ion-label>
+          <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  
+    <ion-list lines="none" *ngIf="messagesService.conversations && messagesService.conversations.length > 0">
+  
+      <div *ngFor="let conversation of messagesService.conversations | conversationFilter:searchFriend">
+        <ion-item *ngIf="conversation.blocked != true" (click)="message(conversation.key)">
+  
+          <ion-avatar slot="start" *ngIf="conversation.friend">
+            <img src="{{conversation.friend.photoURL}}" onError="this.src='./assets/images/default-dp.png'">
+          </ion-avatar>
+          <div [ngClass]=hasUnreadMessages(conversation)>
+            <ion-label>
+              <ion-text>
+                <h2 *ngIf="conversation.friend">{{conversation.friend.displayName}}</h2>
+              </ion-text>
+              <ion-text>
+                <p>{{conversation.message}}</p>
+              </ion-text>
+            </ion-label>
+          </div>
+          <div slot="end" style="display: flex;flex-direction: column;align-items: flex-end;">
+            <ion-badge color="danger" *ngIf="conversation.unreadMessagesCount > 0">
+              {{conversation.unreadMessagesCount}}
+            </ion-badge>
+            <ion-text style="color: #777;font-size: 12px;position: relative;
+            top: -10px;">{{conversation.date | DateFormat}}</ion-text>
+          </div>
+        </ion-item>
       </div>
+    </ion-list>
+  </ng-container>
+
+  <ng-container *ngIf="tab === 'group'">
+    <div class="empty-list" *ngIf="messagesService.groups && messagesService.groups.length <= 0">
+      <h1>
+        <ion-icon name="chatbubbles-outline"></ion-icon>
+      </h1>
+      <p>No new groups yet.</p>
     </div>
-
-    <app-no-data *ngIf="messages.length === 0"></app-no-data>
-  </div>
-
-
-<ion-menu-button class="writer" menu="second" autoHide="true">
-  <img  alt="appicon" src="assets/images/pull.png"/>
-</ion-menu-button>
-
+    <ion-list lines="none" *ngIf="messagesService.isLoading">
+      <ion-item *ngFor="let x of [].constructor(4)">
+        <ion-avatar slot="start">
+          <ion-skeleton-text animated></ion-skeleton-text>
+        </ion-avatar>
+        <ion-label>
+          <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+    <!-- Show groups -->
+    <div *ngIf="messagesService.groups && messagesService.groups.length > 0">
+      <ion-searchbar [(ngModel)]="searchGroup" placeholder="search"></ion-searchbar>
+      <ion-list lines="none">
+        <ng-container *ngFor="let group of messagesService.groups | groupFilter: searchGroup">
+          <ion-item *ngIf="group.name" (click)="viewGroup(group.id)">
+            <ion-thumbnail slot="start">
+              <img src="{{group.img}}" onError="this.src='./assets/images/default-group.png'">
+            </ion-thumbnail>
+            <ion-label>
+              <ion-text>
+                <h2>{{group.name}}</h2>
+              </ion-text>
+              <ion-text>
+                <p>{{group.date | DateFormat}}</p>
+              </ion-text>
+            </ion-label>
+            <ion-badge slot="end" color="danger" *ngIf="group.unreadMessagesCount > 0">{{group.unreadMessagesCount}}
+            </ion-badge>
+          </ion-item>
+        </ng-container>
+      </ion-list>
+    </div>
+  </ng-container>
+  
 </ion-content>
 
-
-
-<ion-toolbar>
-<ion-tabs>
-    <ion-tab-bar slot="bottom">
-
- <ion-tab-button routerLink="/feed" routerDirection="forward">
-           <ion-icon name="home" style="width: 30px; height: 50px;"></ion-icon>
+<ion-toolbar color="secondary">
+  <ion-tabs>
+    <ion-tab-bar color="favorite" slot="bottom">
+      <ion-tab-button routerLink="/profile" routerDirection="forward">
+        <ion-icon  src="assets/icons/person-outline.svg" color="primary" style="width: 30px; height: 50px;"></ion-icon>
       </ion-tab-button>
 
-       <ion-tab-button routerLink="/profile" routerDirection="forward">
-           <ion-icon name="person" style="width: 28px; height: 50px;"></ion-icon>
+      <ion-tab-button routerLink="/people" routerDirection="forward">
+        <ion-icon
+        src="assets/icons/people-outline.svg"
+        color="primary"
+          style="width: 35px; height: 50px;"
+        ></ion-icon>
       </ion-tab-button>
 
-    <ion-tab-button routerLink="/people" routerDirection="forward">
-           <ion-icon name="ios-people" style="width: 35px; height: 50px;"></ion-icon>
+      <ion-tab-button (click)="addPost()">
+        <ion-icon
+        src="assets/icons/add-circle-outline.svg"
+        color="primary" 
+          style="width: 30px; height: 50px;"
+        ></ion-icon>
       </ion-tab-button>
-     
-    
 
+      <ion-tab-button (click)="goToMessages()">
+        <ion-icon src="assets/icons/mail-outline.svg" color="primary" style="width: 30px; height: 50px;"></ion-icon>
+        <ion-badge
+          *ngIf="messagesService.getUnreadMessagesCount() > 0 || messagesService.getUnreadGroupMessagesCount() > 0"
+          class="badgemsg"
+          style="margin-bottom: 7px;"
+          color="green"
+          >{{ messagesService.getUnreadMessagesCount() + messagesService.getUnreadGroupMessagesCount() }}</ion-badge>
+      </ion-tab-button>
 
+      <ion-tab-button (click)="goToNotifications()">
+        <ion-icon
+        color="primary"
+        src="assets/icons/notifications-outline.svg"
+          style="width: 30px; height: 50px;"
+        ></ion-icon>
+        <ion-badge
+          *ngIf="notificationService.unreadCounter > 0"
+          class="badge"
+          style="right: 10%;"
+          color="green"
+          >{{ notificationService.unreadCounter }}</ion-badge
+        >
+      </ion-tab-button>
     </ion-tab-bar>
   </ion-tabs>
- </ion-toolbar> 
-
-<!-- footer with buttons when you select more than one item -->
-<ion-footer *ngIf="getSelection">
-  <div class="buttons">
-    <ion-button size="small" (click)="markAsRead()">Mark as Read</ion-button>
-    <ion-button size="small" (click)="archieve()" color="secondary">Archieve</ion-button>
-    <ion-button size="small" (click)="deleteSelected()" color="danger">Delete</ion-button>
-    <ion-button (click)="getSelection = false" color="dark" fill="clear">
-      <ion-icon src="assets/icons/x.svg"></ion-icon>
-    </ion-button>
-  </div>
-</ion-footer>
+</ion-toolbar>

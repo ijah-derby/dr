@@ -69,21 +69,23 @@
 
 <ion-toolbar>
     <ion-buttons slot="start">
-        <ion-buttons>
             <ion-button (click)="closeModal()">
                 <ion-icon src="assets/icons/x.svg"></ion-icon>
             </ion-button>
-            <ion-button fill="clear" size="small" color="medium" (click)="openSearch = !openSearch">
-                <ion-icon mode="md" name="search"></ion-icon>
-            </ion-button>
-            <ion-button fill="clear" size="small" color="medium">
-                <ion-icon mode="md" name="more"></ion-icon>
-            </ion-button>
         </ion-buttons>
-    </ion-buttons>
+        <ion-buttons slot="end">
+            <img
+              id="hide"
+              alt="appicon"
+              height="22"
+              class="ion-float-right"
+              src="assets/images/logo2.png"
+            />
+          </ion-buttons>
+
 </ion-toolbar>
 
-<ion-content scrollX="false" scrollY="false">
+<ion-content>
     <app-spinner *ngIf="loading"></app-spinner>
     <div class="content-wrapper">
         <div class="header no-border has-toolbar">
@@ -106,7 +108,7 @@
 
         <ng-container *ngIf="post?.videoUrl">
             <div class="video-content">
-                <video [src]="post?.videoUrl" height="100%" width="100%" controls></video>
+                <video [src]="post?.videoUrl" height="100%" width="100%" loop controls></video>
             </div>
         </ng-container>
 
@@ -144,6 +146,7 @@
                             <ion-icon color="medium" name="more" (click)="openOptions(item, i)"></ion-icon>
                         </div>
 
+
                         <div class="options reply-option" style="position: relative">
                             <ion-button class="reply-button" fill="clear" size="small" (click)="openReplies(item, i)">
                                 <ion-icon color="medium" name="redo"></ion-icon>
@@ -161,8 +164,11 @@
 
 <ion-footer>
    <ion-toolbar>
-   <textarea [(ngModel)]="commentMsg"
-             elastic-textarea="5"
+   <textarea 
+   autosize
+   maxrow="4"
+      useImportant="true"
+   [(ngModel)]="commentMsg"      
              (keyup)="keyUpMessage($event)"
              placeholder="{{ 'feed-comment-component.placeholder' | translate }}"
    ></textarea>

@@ -142,6 +142,7 @@
             margin: 10px 15px;
             box-shadow: 1px 1px 12px var(--ion-color-light-shade);
             //height: 45%;
+            border-radius: 20px;
 
             .image {
               width: 50px;
@@ -197,7 +198,7 @@
       outline: none;
       resize: none;
       margin: 5px 10px 0px;
-      border-radius: 3px;
+      border-radius: 20px;
     }
   }
 }

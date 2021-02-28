@@ -8,8 +8,8 @@ import { FeedComponent } from './components/feed/feed.component';
 import { ProgressBarComponent } from 'src/app/pages/feed/progress-bar/progress-bar.component';
 
 @NgModule({
-  declarations: [FeedComponent, FeedAddComponent, ProgressBarComponent],
-  entryComponents: [FeedAddComponent, ProgressBarComponent],
+  declarations: [FeedComponent, ProgressBarComponent],
+  entryComponents: [ProgressBarComponent],
   imports: [
     CommonModule,
     SharedModule,

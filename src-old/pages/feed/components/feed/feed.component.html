@@ -1,0 +1,217 @@
+<!--&lt;!&ndash;<ion-toolbar>&ndash;&gt;-->
+<!--&lt;!&ndash;  <ion-buttons slot="start">&ndash;&gt;-->
+<!--&lt;!&ndash;    <ion-menu-button size="small" autoHide="true"></ion-menu-button>&ndash;&gt;-->
+<!--&lt;!&ndash;  </ion-buttons>&ndash;&gt;-->
+<!--&lt;!&ndash;  <img alt="appicon" height="22" class="ion-float-right" src="assets/images/logo1.png"/>&ndash;&gt;-->
+
+<!--&lt;!&ndash;</ion-toolbar>&ndash;&gt;-->
+
+<!--<ion-toolbar color="favorite">-->
+<!--  <ion-buttons slot="start">-->
+<!--    <ion-menu-button color="medium" size="small" autoHide="true"></ion-menu-button>-->
+
+<!--    <ion-button color="medium" fill="clear" (click)="addPost()">-->
+<!--      <ion-icon mode="md" class="iconSize" name="add-circle" style="width: 25px; height: 50px;"></ion-icon>-->
+<!--    </ion-button>-->
+
+<!--    <ion-button color="medium" fill="clear" class="noti-icon" (click)="goToMessages()">-->
+<!--      <ion-icon name="ios-mail" slot="end" style="width: 25px; height: 50px;"></ion-icon>-->
+<!--      <ion-badge  class="badgemsg" color="green">0</ion-badge>-->
+<!--    </ion-button>-->
+
+<!--    <ion-button color="medium" fill="clear" class="noti-messageicon">-->
+<!--      <ion-icon name="ios-notifications" slot="end" size="small" style="width: 25px; height: 25px; margin-top: 11px;margin-right: 10px;"></ion-icon>-->
+<!--      <ion-badge style="right: 16%" class="badge" color="green">0</ion-badge>-->
+<!--    </ion-button>-->
+<!--  </ion-buttons>-->
+<!--  <ion-buttons slot="end">-->
+<!--    <img alt="appicon" height="22" class="ion-float-right" src="assets/images/logo1.png"/>-->
+<!--  </ion-buttons>-->
+<!--</ion-toolbar>-->
+
+<ion-toolbar color="favorite">
+  <ion-buttons slot="start">
+    <ion-icon
+      name="menu"
+      style="font-size: 25px; padding-left: 10px; color: black;"
+      (click)="openMenu()"
+    ></ion-icon>
+    <!-- <ion-menu-button color="medium" size="small" autoHide="true"></ion-menu-button> -->
+    <!-- <ion-icon name="trash" (click)="load()"></ion-icon> -->
+    <!-- <ion-icon name="cart" class="cart-icon" (click)="goToShop()"></ion-icon> -->
+  </ion-buttons>
+  <ion-buttons slot="end">
+    <img
+      id="hide"
+      alt="appicon"
+      height="22"
+      class="ion-float-right"
+      src="assets/images/logo1.png"
+    />
+  </ion-buttons>
+</ion-toolbar>
+<ion-menu-button class="writer" menu="second" autoHide="true">
+  <img alt="appicon" src="assets/images/pull.png" />
+</ion-menu-button>
+
+<ion-content>
+  <ion-icon
+    class="down"
+    name="md-arrow-dropdown"
+    style="width: 28px; height: 20px;"
+  ></ion-icon>
+
+  <ion-refresher
+    slot="fixed"
+    pullFactor="0.5"
+    pullMin="100"
+    pullMax="200"
+    (ionRefresh)="doRefreshTop($event)"
+  >
+    <ion-refresher-content
+      pullingIcon="arrow-dropdown"
+      pullingText="Pull to refresh"
+      refreshingSpinner="circles"
+      refreshingText="Refreshing..."
+    >
+    </ion-refresher-content>
+  </ion-refresher>
+
+  <app-spinner *ngIf="loading"></app-spinner>
+  <div *ngFor="let item of feed; let i = index">
+    <feed-minimal
+      *ngIf="item && item.user && item.user.displayName"
+      [feed]="item"
+      [itemIndex]="i"
+      (event)="manage($event)"
+    >
+    </feed-minimal>
+  </div>
+  <ion-infinite-scroll threshold="100px" (ionInfinite)="loadMoreFeed($event)">
+    <ion-infinite-scroll-content
+      loadingSpinner="bubbles"
+      loadingText="Loading more..."
+    >
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+</ion-content>
+
+<ion-toolbar color="favorite">
+  <ion-tabs>
+    <ion-tab-bar slot="bottom">
+      <ion-tab-button routerLink="/profile" routerDirection="forward">
+        <ion-icon name="person" style="width: 28px; height: 50px;"></ion-icon>
+      </ion-tab-button>
+
+      <ion-tab-button routerLink="/people" routerDirection="forward">
+        <ion-icon
+          name="ios-people"
+          style="width: 35px; height: 50px;"
+        ></ion-icon>
+      </ion-tab-button>
+
+      <ion-tab-button (click)="addPost()">
+        <ion-icon
+          name="add-circle"
+          style="width: 30px; height: 50px;"
+        ></ion-icon>
+      </ion-tab-button>
+
+      <ion-tab-button (click)="goToMessages()">
+        <ion-icon name="ios-mail" style="width: 30px; height: 50px;"></ion-icon>
+        <ion-badge
+          *ngIf="messageCounter > 0"
+          class="badgemsg"
+          style="margin-bottom: 7px;"
+          color="green"
+          >{{ messageCounter }}</ion-badge
+        >
+      </ion-tab-button>
+
+      <ion-tab-button (click)="goToNotifications()">
+        <ion-icon
+          name="ios-notifications"
+          style="width: 30px; height: 50px;"
+        ></ion-icon>
+        <ion-badge
+          *ngIf="notificationService.unreadCounter > 0"
+          class="badge"
+          style="right: 10%;"
+          color="green"
+          >{{ notificationService.unreadCounter }}</ion-badge
+        >
+      </ion-tab-button>
+    </ion-tab-bar>
+  </ion-tabs>
+</ion-toolbar>
+
+<!--<ion-content>-->
+
+<!--  <ion-refresher slot="fixed" pullFactor="0.5" pullMin="100" pullMax="200" (ionRefresh)="doRefreshTop($event)">-->
+<!--    <ion-refresher-content-->
+<!--            pullingIcon="arrow-dropdown"-->
+<!--            pullingText="Pull to refresh"-->
+<!--            refreshingSpinner="circles"-->
+<!--            refreshingText="Refreshing...">-->
+<!--    </ion-refresher-content>-->
+<!--  </ion-refresher>-->
+
+<!--  <app-spinner *ngIf="loading"></app-spinner>-->
+<!--  <feed-minimal *ngFor="let item of feed; let i = index"-->
+<!--                [feed]="item"-->
+<!--                [itemIndex]="i"-->
+<!--                (event)="manage($event)">-->
+<!--  </feed-minimal>-->
+<!--  <ion-infinite-scroll threshold="100px" (ionInfinite)="loadMoreFeed($event)">-->
+<!--    <ion-infinite-scroll-content-->
+<!--            loadingSpinner="bubbles"-->
+<!--            loadingText="Loading more...">-->
+<!--    </ion-infinite-scroll-content>-->
+<!--  </ion-infinite-scroll>-->
+
+<!--  <img alt="appicon" class="pull" src="assets/images/pull.png"/>-->
+
+<!--&lt;!&ndash;  <div class="content-wrapper">&ndash;&gt;-->
+<!--&lt;!&ndash;    <div class="header no-border has-toolbar">&ndash;&gt;-->
+<!--&lt;!&ndash;      <div class="title">&ndash;&gt;-->
+<!--&lt;!&ndash;        {{ 'feed-component.title' | translate }}&ndash;&gt;-->
+<!--&lt;!&ndash;      </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;      <div class="options">&ndash;&gt;-->
+<!--&lt;!&ndash;        <div class="noti-icon" (click)="goToMessages()">&ndash;&gt;-->
+<!--&lt;!&ndash;          <ion-icon name="chatbubbles" slot="end" size="small" style="width: 25px; height: 25px; margin-top: 11px;"></ion-icon>&ndash;&gt;-->
+<!--&lt;!&ndash;          <ion-badge *ngIf="counter > 0" color="green">{{ counter }}</ion-badge>&ndash;&gt;-->
+<!--&lt;!&ndash;        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;        <ion-button fill="clear"  color="medium" (click)="addPost()">&ndash;&gt;-->
+<!--&lt;!&ndash;          <ion-icon mode="md" class="iconSize" name="add-circle"></ion-icon>&ndash;&gt;-->
+<!--&lt;!&ndash;        </ion-button>&ndash;&gt;-->
+<!--&lt;!&ndash;      </div>&ndash;&gt;-->
+<!--&lt;!&ndash;    </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;    <app-tab-menu [tabs]="views" (event)="view = $event"></app-tab-menu>&ndash;&gt;-->
+<!--&lt;!&ndash;    <app-search-bar *ngIf="openSearch" (event)="onSearch($event)"></app-search-bar>&ndash;&gt;-->
+
+<!--&lt;!&ndash;    <div class="wrapper">&ndash;&gt;-->
+<!--&lt;!&ndash;      <div class="content-scroll" #content>&ndash;&gt;-->
+<!--&lt;!&ndash;        <ng-container [ngSwitch]="view">&ndash;&gt;-->
+<!--&lt;!&ndash;          <ng-container *ngSwitchCase="1">&ndash;&gt;-->
+<!--&lt;!&ndash;            <feed-modern *ngFor="let item of feed" [feed]="item" (event)="manage($event)"> </feed-modern> &ndash;&gt;-->
+<!--&lt;!&ndash;          </ng-container>&ndash;&gt;-->
+<!--&lt;!&ndash;          <ng-container *ngSwitchCase="2">&ndash;&gt;-->
+<!--&lt;!&ndash;           <iframe id="FrameContent" style="width: 100%; height: 100vh; margin-top: -0px; visibility: visible;" title="" src="https://dontramp.com/upload" frameborder="0" allowfullscreen="allowfullscreen"></iframe>&ndash;&gt;-->
+<!--&lt;!&ndash;          </ng-container>&ndash;&gt;-->
+<!--&lt;!&ndash;          <ng-container *ngSwitchCase="3">&ndash;&gt;-->
+<!--&lt;!&ndash;            <iframe id="FrameContent" style="width: 100%; height: 100vh; margin-top: -0px; visibility: visible;" title="" src="https://dontramp.com/videos" frameborder="0" allowfullscreen="allowfullscreen"></iframe>&ndash;&gt;-->
+<!--&lt;!&ndash;          </ng-container>&ndash;&gt;-->
+<!--&lt;!&ndash;          <ng-container *ngSwitchCase="4">&ndash;&gt;-->
+<!--&lt;!&ndash;           <iframe id="FrameContent" style="width: 100%; height: 100vh; margin-top: -0px; visibility: visible;" title="" src="https://dontramp.com/main1" frameborder="0" allowfullscreen="allowfullscreen"></iframe>&ndash;&gt;-->
+<!--&lt;!&ndash;          </ng-container>&ndash;&gt;-->
+<!--&lt;!&ndash;          <ng-container *ngSwitchDefault>&ndash;&gt;-->
+<!--&lt;!&ndash;            <feed-modern *ngFor="let item of feed" [feed]="item" (event)="manage($event)"> </feed-modern>&ndash;&gt;-->
+<!--&lt;!&ndash;          </ng-container>&ndash;&gt;-->
+
+<!--&lt;!&ndash;        </ng-container>&ndash;&gt;-->
+<!--&lt;!&ndash;      </div>&ndash;&gt;-->
+<!--&lt;!&ndash;    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;  </div>&ndash;&gt;-->
+<!--</ion-content>-->

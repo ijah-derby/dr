@@ -56,6 +56,11 @@ const routes: Routes = [
   },
   {
     canActivate: [AuthGuard],
+    path: 'message',
+    loadChildren: () => import('./pages/message/message.module').then((m) => m.MessagePageModule)
+  },
+  {
+    canActivate: [AuthGuard],
     path: 'setting',
     loadChildren: () => import('../pages/setting/setting.module').then((m) => m.SettingModule)
   },
@@ -101,7 +106,13 @@ const routes: Routes = [
 
   { path: 'setting', loadChildren: () => import('../pages/Shopping/setting/setting.module').then((m) => m.SettingPageModule) },
   { path: 'shop', loadChildren: () => import('../pages/Shopping/shop/shop.module').then((m) => m.ShopPageModule)},
-  { path: 'signup', loadChildren: () => import('../pages/Shopping/signup/signup.module').then((m) => m.SignupPageModule) }
+  { path: 'signup', loadChildren: () => import('../pages/Shopping/signup/signup.module').then((m) => m.SignupPageModule) },
+  { path: 'news', loadChildren: './news/news.module#NewsPageModule' },
+  { path: 'browser', loadChildren: './browser/browser.module#BrowserPageModule' },
+  { path: 'newgroup', loadChildren: './pages/newgroup/newgroup.module#NewgroupPageModule' },
+  { path: 'group', loadChildren: './pages/group/group.module#GroupPageModule' },
+  { path: 'group-info', loadChildren: './pages/group-info/group-info.module#GroupInfoPageModule' },
+  { path: 'add-members', loadChildren: './pages/add-members/add-members.module#AddMembersPageModule' }
 ];
 
 @NgModule({

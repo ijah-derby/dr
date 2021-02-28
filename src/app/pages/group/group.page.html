@@ -1,0 +1,107 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button mode="md" defaultHref="messages"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{title}}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="groupInfo()">
+        <ion-icon name="information-circle-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <div class="messages" #content>
+    <p class="center" *ngIf="startIndex > 0"><span tappable (click)="loadPreviousMessages()">Load previous
+        messages</span></p>
+    <div *ngFor="let message of messagesToShow; let i = index;">
+      <!--  System Message -->
+      <div *ngIf="isSystemMessage(message)" class="chatbox right system">
+        <p>
+          <ion-icon name="{{message.icon}}"></ion-icon>
+          {{message.message}} {{message.date | DateFormat}}
+        </p>
+      </div>
+      <!--  Message -->
+      <div *ngIf="isSender(message) && !isSystemMessage(message)" class="chatbox right">
+
+        <div *ngIf="isSender(message) && !isSystemMessage(message)">
+          <div class="msg-header" (click)="viewUser(message.sender)">
+            <img *ngIf="!message.avatar" src="../../../assets/images/default-group.png" alt="">
+            <img *ngIf="message.avatar" [src]="message.avatar" alt="">
+            <h6 class="msg-name">{{message.displayName ?  message.displayName : 'User Deleted'}}</h6>
+          </div>
+          <div *ngIf="message.type == 'text'" (click)="openMsgOption(message.id, i)">
+            <p [innerHTML]="getMessage(message.message)"></p>
+            <span>{{message.date | DateFormat}}</span>
+          </div>
+          <div *ngIf="message.type == 'location'" (click)="openMsgOption(messag.id, i)" [innerHtml]="message.message"></div>
+          <div *ngIf="message.type == 'image'" (click)="openMsgOption(message.id, i)">
+            <img tappable (click)="enlargeImage(message.url)" src="{{message.url}}" (load)="scrollBottom()"
+              onError="this.src='./assets/images/default-dp.png'" />
+            <span>{{message.date | DateFormat}}</span>
+          </div>
+          <div *ngIf="message.type == 'video'" (click)="openMsgOption(message, i)">
+            <video controls width="100%" (click)="openMsgOption(message.id, i)">
+              <source src="{{message.url}}" type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!isSender(message) && !isSystemMessage(message)" class="chatbox left">
+        <div class="msg-header" (click)="viewUser(message.sender)">
+          <img *ngIf="!message.avatar" src="../../../assets/images/default-group.png" alt="" tappable (load)="scrollBottom()">
+          <img *ngIf="message.avatar" [src]="message.avatar" alt="" tappable (load)="scrollBottom()">
+          <h6 class="msg-name">{{message.displayName ?  message.displayName : 'User Deleted'}}</h6>
+        </div>
+        <!-- <img src="{{message.avatar}}" tappable (click)="viewUser(message.sender)" (load)="scrollBottom()"
+          onError="this.src='./assets/images/default-dp.png'" style="height:30px; border-radius: 100%;float:left;" /> -->
+        <div *ngIf="message.type == 'text'">
+          <p [innerHTML]="getMessage(message.message)"></p>
+          <span>{{message.date | DateFormat}}</span>
+        </div>
+        <div *ngIf="message.type == 'location'" [innerHtml]="message.message"></div>
+        <div *ngIf="message.type == 'image'">
+          <img tappable (click)="enlargeImage(message.url)" src="{{message.url}}"
+            onError="this.src='./assets/images/default-dp.png'" (load)="scrollBottom()" />
+          <span>{{message.date | DateFormat}}</span>
+        </div>
+        <div *ngIf="message.type == 'video'">
+          <video controls width="100%" #videoPlayer>
+            <source src="{{message.url}}" type="video/mp4">
+          </video>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</ion-content>
+<!-- Message Box -->
+<ion-footer>
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-button slot="start" fill="clear" (click)="attach()">
+        <ion-icon name="attach"></ion-icon>
+      </ion-button>
+      <ion-textarea autoGrow="true" style="height:100%" (ionFocus)="scrollBottom()" rows="1◊"
+        placeholder="Type your message" [(ngModel)]="message">
+      </ion-textarea>
+      <ion-button slot="end" color="primary" fill="clear" (click)="send('text')" [disabled]="!message">
+        <ion-icon name="send"></ion-icon>
+      </ion-button>
+    </ion-item>
+  </ion-toolbar>
+</ion-footer>
+
+<input
+  hidden
+  #fileInputButton
+  type="file"
+  (change)="detectFiles($event)"
+  multiple
+/>
+<input hidden #videoInputButton type="file" (change)="detectVideo($event)" />

@@ -16,7 +16,7 @@
               font-weight: 500;
             }
           }
-
+        
           app-simple-item {
             align-items: center;
             margin: 10px 0;
@@ -60,3 +60,23 @@ margin-right: 15px;
   }
 }
 
+.tool {
+  box-shadow: 0px 0.3px 0px #a8a8a8!important;
+}
+
+.margin{
+  margin-left: 15px;
+}
+
+.update{
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.iconupdate{
+  height: 40px;
+}
+
+.update2 {
+  margin-left: 15px;  
+}

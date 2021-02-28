@@ -1723,3 +1723,86 @@ ion-slides{
 		// }
 	}
 }
+
+
+// CHAT GLOBAL CSS
+
+.header-md:after{
+    background-image: none;
+  }
+  
+  .center{
+      text-align:center
+  }
+  .gray-text{
+    color: #777;
+  }
+  
+  .empty-list{
+      text-align: center;
+      display: flex;
+      height: 100vw;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      color: #999999;
+  }
+  .chatbox{
+      padding: 8px;
+      border-radius: 8px;
+      max-width: 70%;
+      min-width: 70%;
+      margin: 4px 12px;
+    }
+  .chatbox p{
+    margin:0;
+	white-space: break-spaces;
+  }
+    .chatbox span{
+      font-size: 12px;
+    }
+    .right{
+      color: #444;
+      float: right;
+      text-align: right;
+      padding-right: 5px;
+      border: 2px solid #eee;
+    }
+    .left{
+    //   background: #eee;
+	//   border: 2px solid #eee;
+      color: #444;
+      float: left;
+      text-align: left;
+    }
+    video{
+      background: #eee;
+      border-radius: 5px;
+    }
+    
+  .error{
+    margin:0;
+    color: #F44336;
+    font-size: 12px;
+  }
+  
+  ion-text p{
+    color: #777;
+    margin: 4px 0px !important;
+  }
+  
+  .header-ios ion-toolbar:last-child{
+    --border-color: #eee;
+  }
+
+  .upload-modal {
+	--height: 10%;
+    --width: 50%;
+    --border-radius: 10px;
+  }
+
+  .url {
+    font-size: 16px !important;
+    color: #3880ff;
+    text-decoration: underline;
+}

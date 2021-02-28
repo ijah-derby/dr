@@ -1,0 +1,36 @@
+.item-prd{
+	.thumb{
+		position: relative;
+		height: 150px;
+		img{
+			height: 100%;
+			min-width: 100%;
+		}
+		.discount{
+			z-index: 100;
+			position: absolute;
+			top: 10px;
+			left: 0px;
+			height: 25px;
+			width: 80px;
+			overflow: hidden;
+			&:before{
+				content: "";
+				background: var(--ion-background-color);
+				display: block;
+				height: 200%;
+				width: 180%;
+				margin-left: -100px;
+				transform: rotate(-15deg);
+				position: absolute;
+				z-index: -1;
+			}
+		}
+		.favo-btn{
+			z-index: 10;
+			position: absolute;
+			right: 10px;
+			bottom: 5px;
+		}
+	}
+}

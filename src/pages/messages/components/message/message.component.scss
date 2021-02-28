@@ -74,6 +74,8 @@
     }
   }
 
+ 
+
   ion-footer {
     textarea {
       padding: 5px 10px;
@@ -84,7 +86,9 @@
       outline: none;
       resize: none;
       margin: 5px 10px 0px;
-      border-radius: 3px;
+      border-radius: 20px;
+        color: black;
+    
     }
   }
 }

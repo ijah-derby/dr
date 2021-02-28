@@ -1,32 +1,57 @@
 :host {
-  display: block;
+  display: flex;
   margin: 5px;
-  padding: 10px 15px;
+  padding: 15px;
   border-radius: 12px;
   box-shadow: 1px 2px 5px var(--ion-color-medium-tint);
   background: var(--ion-color-light);
 
-  .author {
-    padding-left: 12px;
-    padding-bottom: 8px;
+  .start,
+  .end {
     display: flex;
+    flex: 1;
+  }
 
-    .image {
-      width: 40px;
-      height: 40px;
-      border-radius: 100%;
+  .image-profile {
+    width: 45px;
+    height: 45px;
+    border-radius: 100%;
+  }
+
+  
+
+.open-detail{
+  margin-left: 30px;
+}
+
+  .start {
+    flex-direction: column;
+    justify-content: space-between;
+    padding-right: 10px;
+
+    .title {
+      color: black;
+      font-size: 16px;
+      font-weight: 500;
     }
 
-    .details {
-      padding: 0 10px;
+    .content {
+      color: black;
+      font-size: 16px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--ion-color-light-shade);
+      font-weight: 500;
+    }
+
+    .author {
       display: flex;
+      margin: 10px 0;
       flex-direction: column;
-      flex: 1;
 
       .name {
-        font-size: 14px;
+        font-size: 15px;
         font-weight: 600;
-        text-transform: capitalize;
+        color: var(--ion-color-primary);
       }
 
       .publish-date {
@@ -35,71 +60,55 @@
         color: var(--ion-color-medium-shade);
       }
     }
-  }
 
-  .image-content {
-    display: flex;
-    height: 340px;
-    width: 100%;
-
-    .left,
-    .right {
+    .actions {
       display: flex;
       align-items: center;
-      background: rgba(var(--ion-color-medium-rgb), 0.6);
-      padding: 0 15px;
-      color: var(--ion-color-light);
-    }
 
-    .center {
-      display: flex;
-      flex: 1;
-    }
+      ion-button {
+        --padding-start: 0;
+        --padding-end: 0;
+      }
 
-    .right {
-      justify-content: flex-end;
+      small {
+        padding-left: 5px;
+      }
     }
   }
 
-  .content {
-    display: flex;
-    flex-direction: column;
+  
 
-
-    .title {
-      padding-top: 3px;
-      padding-left: 15px;
-      padding-right: 15px;
-      font-size: 15px;
-      font-weight: 600;
-    }
-
-    .subtitle {
-      padding-left: 15px;
-      padding-right: 15px;
-      font-size: 14px;
-      font-weight: 500;
-      margin-bottom: -8px;
-    }
+  .youtvids{
+    border-radius: 6px; 
+    margin-left: 12%;
   }
 
-  .actions {
-    display: flex;
-    align-items: center;
-    margin-bottom: -8px;
-    margin-top: 5px;
-    small {
-      padding-left: 5px;
+  
+  
 
-    }
-    .start {
+  .end {
+    .image {
       display: flex;
+      flex-direction: column;
       flex: 1;
-    }
+      width: 100%;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 1px 2px 5px var(--ion-color-medium-tint);
+      .left,
+      .right {
+        display: flex;
+        align-items: center;
+        background: rgba(var(--ion-color-medium-rgb), 0.4);
+        padding: 2px 0;
+        color: var(--ion-color-light);
+        justify-content: center;
+      }
 
-    .end {
-      display: flex;
-
+      .center {
+        display: flex;
+        flex: 1;
+      }
     }
   }
 }

@@ -8,6 +8,7 @@ import { Extender } from 'src/shared/helpers/extender';
 import { FirestoreService } from 'src/shared/services/firestore/firestore.service';
 import { IChat, IMessage } from '../../models/message';
 import { AngularFirestore } from '@angular/fire/firestore';
+import { NavController } from '@ionic/angular';
 
 /**
  * crud methods to interact with firebase cloud store regarding messaging
@@ -21,7 +22,13 @@ export class MessagesService extends Extender {
   currentUser: IUser;
   public unreadCounter: number = 0;
 
-  constructor(protected injector: Injector, private authService: AuthService, private firestoreService: FirestoreService, private angularFireStore: AngularFirestore) {
+  constructor(
+    protected injector: Injector, 
+    private authService: AuthService, 
+    private firestoreService: FirestoreService, 
+    private angularFireStore: AngularFirestore,
+    private navCtrl: NavController
+  ) {
     super(injector);
   }
 
@@ -90,16 +97,23 @@ export class MessagesService extends Extender {
    * if message exists, navigate to chat modal
    */
   public startChat(user: IUser) {
-    this.firestoreService
-      .colWithIds$<IMessage>('messages', (ref: any) => ref.where('participantsId', 'array-contains', user.uid))
-      .subscribe((data) => {
-        const message = data[0];
-        if (!message) {
-          this.createMessage(user);
-        } else {
-          this.goto(`${this.routes.messages}/${message.id}`);
+    // this.firestoreService
+    //   .colWithIds$<IMessage>('messages', (ref: any) => ref.where('participantsId', 'array-contains', user.uid))
+    //   .subscribe((data) => {
+    //     const message = data[0];
+    //     if (!message) {
+    //       this.createMessage(user);
+    //     } else {
+    //       this.goto(`${this.routes.messages}/${message.id}`);
+    //     }
+    //   });
+    if(user.uid) {
+      this.navCtrl.navigateForward('message', {
+        queryParams: {
+          id: user.uid
         }
       });
+    }
   }
 
   /** delete a message in chat */

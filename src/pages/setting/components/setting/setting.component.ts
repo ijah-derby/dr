@@ -5,6 +5,7 @@ import {AuthService} from '../../../auth/services/auth/auth.service';
 import { IPreference, ISetting } from '../../model/preference';
 import { SettingService } from '../../services/setting/setting.service';
 
+
 /**
  * manage users preferences
  */
@@ -38,6 +39,10 @@ export class SettingComponent extends Extender implements OnInit {
   public save() {
     this.settingService.upsertPreferences(this.settingService.setting);
   }
+
+  openUpdate() {
+    window.open('https://play.google.com/store/apps/details?id=com.dontramp.drm&hl=en_GB&gl=US', '_system', 'location=yes');
+    }
 
   /** logout and return to welcome or auth screen */
   public signOut() {

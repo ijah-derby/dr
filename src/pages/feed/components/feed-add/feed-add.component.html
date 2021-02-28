@@ -1,13 +1,22 @@
 <ion-content>
   <div class="content-wrapper" *ngIf="currentUser && feed">
     <div class="author">
-      <div class="image" [image-loader]="currentUser.photoURL" (click)="uploadVideo()"></div>
+      <div
+        class="image"
+        [image-loader]="currentUser.photoURL"
+        (click)="uploadVideo()"
+      ></div>
       <div class="details">
         <div class="name">{{ currentUser.displayName }}</div>
         <div class="publish-date">{{ currentUser.email }}</div>
       </div>
       <div class="option">
-        <ion-button fill="clear" color="medium" size="small" (click)="closeModal()">
+        <ion-button
+          fill="clear"
+          color="medium"
+          size="small"
+          (click)="closeModal()"
+        >
           <ion-icon name="close"></ion-icon>
         </ion-button>
       </div>
@@ -16,23 +25,23 @@
     <div class="wrapper">
       <div class="input-wrapper light fill" *ngIf="more || videoShare">
         <textarea
-                placeholder="{{ 'feed-add-component.title-label' | translate }}"
-                autosize
-                maxRows="3"
-                name="title"
-                #title="ngModel"
-                [(ngModel)]="feed.title"
+          placeholder="{{ 'feed-add-component.title-label' | translate }}"
+          autosize
+          maxRows="3"
+          name="title"
+          #title="ngModel"
+          [(ngModel)]="feed.title"
         ></textarea>
       </div>
 
       <div class="input-wrapper light fill" *ngIf="more">
         <textarea
-                placeholder="{{ 'feed-add-component.subtitle-label' | translate }}"
-                autosize
-                maxRows="3"
-                name="subtitle"
-                #subtitle="ngModel"
-                [(ngModel)]="feed.subtitle"
+          placeholder="{{ 'feed-add-component.subtitle-label' | translate }}"
+          autosize
+          maxRows="3"
+          name="subtitle"
+          #subtitle="ngModel"
+          [(ngModel)]="feed.subtitle"
         ></textarea>
       </div>
 
@@ -40,24 +49,25 @@
         <div class="row">
           <div class="prefix"><span class="lnr lnr-bubble"></span></div>
           <textarea
-                  placeholder="{{ 'feed-add-component.content-label' | translate }}"
-                  autosize
-                  maxRows="3"
-                  name="content"
-                  #content="ngModel"
-                  [(ngModel)]="feed.content"
+            placeholder="{{ 'feed-add-component.content-label' | translate }}"
+            autosize
+            maxRows="3"
+            name="content"
+            #content="ngModel"
+            [(ngModel)]="feed.content"
+            [(ngModel)]="name"
           ></textarea>
         </div>
       </div>
 
       <div class="input-wrapper light fill" *ngIf="videoShare">
         <textarea
-                placeholder="{{ 'feed-add-component.video-label' | translate }}"
-                autosize
-                maxRows="3"
-                name="videoContent"
-                #subtitle="ngModel"
-                [(ngModel)]="feed.videoContent"
+          placeholder="{{ 'feed-add-component.video-label' | translate }}"
+          autosize
+          maxRows="3"
+          name="videoContent"
+          #subtitle="ngModel"
+          [(ngModel)]="feed.videoContent"
         ></textarea>
       </div>
 
@@ -65,45 +75,79 @@
       <div class="image-content" *ngIf="images.length >= 1 && !videoShare">
         <div class="images">
           <div
-                  class="image-item"
-                  *ngFor="let item of images; let i = index"
-                  [image-loader]="item"
-                  (click)="doMoreOnImage(item, i)"
+            class="image-item"
+            *ngFor="let item of images; let i = index"
+            [image-loader]="item"
+            (click)="doMoreOnImage(item, i)"
           ></div>
         </div>
       </div>
 
       <!-- video section -->
       <div class="actions mt10" *ngIf="videoUrl && videoUrl != ''">
-        <div class="end" style="margin-right: 0;margin-left: auto;display: block;">
-          <ion-button size="small" shape="round" (click)="save()"
-                      [disabled] = "videoShare && feed.title && !feed.videoContent">
-            {{ 'feed-add-component.post-button' | translate }}
+        <div
+          class="end"
+          style="margin-right: 0; margin-left: auto; display: block;"
+        >
+          <ion-button
+            size="small"
+            shape="round"
+            (click)="save()"
+            [disabled]="videoShare && feed.title && !feed.videoContent"
+          >
+            {{ "feed-add-component.post-button" | translate }}
           </ion-button>
         </div>
       </div>
 
-      <div *ngIf="videoUrl && videoUrl != ''">
+      <div
+        *ngIf="progressVal <= 0 && videoUrl && videoUrl != ''"
+      >
         <div>
-          <ion-icon name="close-circle" class="close-icon" (click)="reset()"></ion-icon>
-          <video style="width: 100%;border: 1px solid lightgray;" controls [src]="videoUrl"></video>
+          <ion-icon
+            name="close-circle"
+            class="close-icon"
+            (click)="reset()"
+          ></ion-icon>
+          <video
+            style="width: 100%; border: 1px solid lightgray;"
+            controls
+            [src]="videoUrl"
+          ></video>
         </div>
       </div>
 
       <!-- action section -->
       <div class="actions mt10">
         <div class="start">
-          <ion-button fill="clear" *ngFor="let item of feedOptions" (click)="item.click()"
-                      [disabled]="item.disable">
+          <ion-button
+            fill="clear"
+            *ngFor="let item of feedOptions"
+            (click)="item.click()"
+            [disabled]="item.disable"
+          >
             <ion-icon src="assets/icons/{{ item.icon }}.svg"></ion-icon>
           </ion-button>
         </div>
         <div class="end" *ngIf="!videoUrl || videoUrl == ''">
-          <ion-button size="small" shape="round" (click)="save()"
-                      [disabled] = "videoShare && feed.title && !feed.videoContent">
-            {{ 'feed-add-component.post-button' | translate }}
+          <ion-button
+            size="small"
+            shape="round"
+            (click)="save()"
+            [disabled]="videoShare && feed.title && !feed.videoContent"
+          >
+            {{ "feed-add-component.post-button" | translate }}
           </ion-button>
         </div>
+      </div>
+      <div style="margin-top: 5%;" *ngIf="progressVal > 0">
+        <ion-progress-bar
+          color="primary"
+          [value]="progressVal / 100"
+        ></ion-progress-bar>
+        <p class="ion-no-margin" style="font-size: 12px; margin-top: 5px;">
+          Uploading Video...
+        </p>
       </div>
     </div>
   </div>
@@ -112,6 +156,11 @@
 <app-spinner *ngIf="loading"></app-spinner>
 
 <!-- required for browser file upload -->
-<input hidden #fileInputButton type="file" (change)="detectFiles($event)" multiple />
-<input hidden #videoInputButton type="file" (change)="detectVideo($event)"/>
-
+<input
+  hidden
+  #fileInputButton
+  type="file"
+  (change)="detectFiles($event)"
+  multiple
+/>
+<input hidden #videoInputButton type="file" (change)="detectVideo($event)" />

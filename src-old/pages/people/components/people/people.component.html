@@ -1,0 +1,213 @@
+<!--<ion-toolbar>-->
+<!--  <ion-buttons slot="start">-->
+<!--    <ion-menu-button size="small" autoHide="true"></ion-menu-button>-->
+<!--  </ion-buttons>-->
+<!--  <img alt="appicon" height="22" class="ion-float-right" src="assets/images/logo1.png"/>-->
+<!--</ion-toolbar>-->
+
+<ion-toolbar color="favorite">
+  <ion-buttons slot="start">
+    <ion-menu-button
+      (click)="openMenu()"
+      color="medium"
+      size="small"
+      autoHide="true"
+    ></ion-menu-button>
+  </ion-buttons>
+  <ion-buttons slot="end">
+    <img
+      id="hide"
+      alt="appicon"
+      height="22"
+      class="ion-float-right"
+      src="assets/images/logo1.png"
+    />
+  </ion-buttons>
+</ion-toolbar>
+
+<ion-content>
+  <app-search-bar
+    style="position: fixed; background-color: white; z-index: 100;"
+    *ngIf="openSearch"
+    (event)="onSearch($event)"
+  ></app-search-bar>
+
+  <app-no-data *ngIf="list.length === 0"> </app-no-data>
+
+  <ion-list
+    [ngStyle]="{ 'margin-top': openSearch ? '40px' : '0px' }"
+    *ngIf="list && list.length > 0 && !isSearched"
+  >
+    <div class="group">
+      <!-- <div class="title" style="display: none;" [id]="group.letter">
+        {{ group.letter }}
+      </div> -->
+      <ion-item
+        class="contact"
+        *ngFor="let contact of list; let i = index"
+        lines="none"
+      >
+        <div
+          class="image"
+          [image-loader]="contact.photoURL"
+          (click)="open(contact.uid)"
+        ></div>
+        <div class="detail" (click)="open(contact.uid)">
+          <div class="name">{{ contact.displayName }}</div>
+          <div class="city" *ngIf="contact.town">{{ contact.town }}</div>
+          <div class="country" *ngIf="contact.country">
+            {{ contact.country }}
+          </div>
+        </div>
+
+        <div class="more">
+          <ion-button
+            *ngIf="isFriend(contact.uid)"
+            size="small"
+            fill="clear"
+            shape="round"
+            (click)="openMore(contact)"
+          >
+            <ion-icon name="more"></ion-icon>
+          </ion-button>
+          <ion-button
+            *ngIf="!isFriend(contact.uid)"
+            class="follow-btn"
+            size="small"
+            shape="round"
+            (click)="manage(contact)"
+          >
+            {{ "people-component.follow" | translate }}
+          </ion-button>
+        </div>
+
+        <a
+          hidden
+          #callNumber
+          href="tel:+{{ contact.mobile || contact.phone }}"
+        ></a>
+      </ion-item>
+    </div>
+  </ion-list>
+
+  <ion-list
+    [ngStyle]="{ 'margin-top': openSearch ? '40px' : '0px' }"
+    *ngIf="fullList && fullList.length > 0 && isSearched"
+  >
+    <div class="group">
+      <!-- <div class="title" style="display: none;" [id]="group.letter">
+        {{ group.letter }}
+      </div> -->
+      <ion-item
+        class="contact"
+        *ngFor="let contact of fullList; let i = index"
+        lines="none"
+      >
+        <div
+          class="image"
+          [image-loader]="contact.photoURL"
+          (click)="open(contact.uid)"
+        ></div>
+        <div class="detail" (click)="open(contact.uid)">
+          <div class="name">{{ contact.displayName }}</div>
+          <div class="city" *ngIf="contact.town">{{ contact.town }}</div>
+          <div class="country" *ngIf="contact.country">
+            {{ contact.country }}
+          </div>
+        </div>
+
+        <div class="more">
+          <ion-button
+            *ngIf="isFriend(contact.uid)"
+            size="small"
+            fill="clear"
+            shape="round"
+            (click)="openMore(contact)"
+          >
+            <ion-icon name="more"></ion-icon>
+          </ion-button>
+          <ion-button
+            *ngIf="!isFriend(contact.uid)"
+            class="follow-btn"
+            size="small"
+            shape="round"
+            (click)="manage(contact)"
+          >
+            {{ "people-component.follow" | translate }}
+          </ion-button>
+        </div>
+
+        <a
+          hidden
+          #callNumber
+          href="tel:+{{ contact.mobile || contact.phone }}"
+        ></a>
+      </ion-item>
+    </div>
+  </ion-list>
+  <!-- <div class="link-alpha">
+    <li
+      class="alpha-link-item"
+      *ngFor="let item of alpha"
+      (click)="scrollTo(item)"
+    >
+      {{ item }}
+    </li>
+  </div> -->
+  <ion-infinite-scroll *ngIf="!isSearched" (ionInfinite)="loadData($event)">
+    <ion-infinite-scroll-content
+      loadingSpinner="bubbles"
+      loadingText="Loading more persons..."
+    >
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+  <!-- </div> -->
+
+  <app-spinner *ngIf="loading"></app-spinner>
+</ion-content>
+
+<ion-menu-button class="writer" menu="second" autoHide="true">
+  <img alt="appicon" src="assets/images/pull.png" />
+</ion-menu-button>
+
+<!-- <div class="link-alpha">
+        <li
+          class="alpha-link-item"
+          *ngFor="let item of alpha"
+          (click)="scrollTo(item)"
+        >
+          {{ item }}
+        </li>
+      </div> -->
+
+<ion-toolbar>
+  <ion-tabs>
+    <ion-tab-bar slot="bottom">
+      <ion-tab-button routerLink="/feed" routerDirection="forward">
+        <ion-icon name="home" style="width: 30px; height: 50px;"></ion-icon>
+      </ion-tab-button>
+
+      <ion-tab-button routerLink="/profile" routerDirection="forward">
+        <ion-icon name="person" style="width: 28px; height: 50px;"></ion-icon>
+      </ion-tab-button>
+
+      <ion-tab-button (click)="openSearch = !openSearch">
+        <ion-icon name="search" style="width: 30px; height: 50px;"></ion-icon>
+      </ion-tab-button>
+
+      <ion-tab-button (click)="goToNotifications()">
+        <ion-icon
+          name="ios-notifications"
+          style="width: 30px; height: 50px;"
+        ></ion-icon>
+        <ion-badge
+          *ngIf="notificationCounter > 0"
+          class="badge"
+          style="right: 12%; bottom: 15px;"
+          color="green"
+          >{{ notificationService.unreadCounter }}</ion-badge
+        >
+      </ion-tab-button>
+    </ion-tab-bar>
+  </ion-tabs>
+</ion-toolbar>

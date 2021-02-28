@@ -1,0 +1,152 @@
+<ion-header>
+  <ion-toolbar color="favorite">
+    <ion-buttons style="float: left;">
+      <!-- <ion-icon name="chevron-back"></ion-icon> -->
+      <ion-icon
+        style="color: black; font-size: 26px; margin-left: 12px;"
+        icon="../../../../assets/icons/chevron-back.svg"
+        (click)="goBack()"
+      ></ion-icon>
+    </ion-buttons>
+    <ion-buttons style="float: right;">
+      <img
+        id="hide"
+        alt="appicon"
+        height="22"
+        class="ion-float-right"
+        src="assets/images/logo1.png"
+      />
+    </ion-buttons>
+  </ion-toolbar>
+
+  <ion-menu-button class="writer" menu="second" autoHide="true">
+    <img alt="appicon" src="assets/images/pull.png" />
+  </ion-menu-button>
+</ion-header>
+
+<ion-content scrollX="false" scrollY="false">
+  <!-- <img src="../../../../assets/icons/chevron-back.svg" alt=""> -->
+  <div class="content-wrapper">
+    <ng-container *ngIf="user">
+      <div class="profile-header">
+        <div
+          class="image"
+          [image-loader]="user.photoURL"
+          (click)="showProfilePhoto(user.photoURL)"
+        ></div>
+        <div class="detail">
+          <div class="title">{{ user.displayName }}</div>
+          <div class="status-msg">
+            {{ (user.statusMessage | slice: 0:50) || "I am a Dont Rampian" }}
+          </div>
+          <div class="country" *ngIf="user.country">{{ user.country }}</div>
+          <ion-button
+            *ngIf="!loading && !isFriend() && otherUser"
+            class="follow"
+            (click)="manage()"
+            >{{ "person-component.follow" | translate }}</ion-button
+          >
+          <!-- show if following -->
+          <ion-fab slot="fixed" *ngIf="!loading && isFriend() && otherUser">
+            <ion-fab-button size="small">
+              <ion-icon name="add"></ion-icon>
+            </ion-fab-button>
+            <ion-fab-list side="bottom">
+              <ion-fab-button>
+                <ion-icon
+                  (click)="call()"
+                  src="assets/icons/phone-call.svg"
+                ></ion-icon>
+              </ion-fab-button>
+              <ion-fab-button>
+                <ion-icon
+                  (click)="chat()"
+                  src="assets/icons/message-square.svg"
+                ></ion-icon>
+              </ion-fab-button>
+              <ion-fab-button>
+                <ion-icon
+                  (click)="share()"
+                  src="assets/icons/share-2.svg"
+                ></ion-icon>
+              </ion-fab-button>
+            </ion-fab-list>
+          </ion-fab>
+        </div>
+      </div>
+      <div class="profile-menu">
+        <div
+          class="menu-item"
+          [ngClass]="{ active: selectedView === item.id }"
+          *ngFor="let item of views"
+          (click)="selectedView = item.id"
+        >
+          <strong>{{ item.value }}</strong>
+          <span>{{ item.name }}</span>
+        </div>
+        <ion-button
+          fill="clear"
+          *ngIf="!otherUser"
+          color="medium"
+          (click)="more()"
+        >
+          <ion-icon mode="md" name="ios-settings"></ion-icon>
+        </ion-button>
+      </div>
+      <div class="profile-content">
+        <ng-container [ngSwitch]="selectedView">
+          <ng-container *ngSwitchCase="1">
+            <app-user-people
+              [user]="user"
+              (navigateEvent)="navRecieved($event)"
+            ></app-user-people>
+          </ng-container>
+          <ng-container *ngSwitchCase="2">
+            <app-user-people
+              following="true"
+              [user]="user"
+              (navigateEvent)="navRecieved($event)"
+            ></app-user-people>
+          </ng-container>
+          <ng-container *ngSwitchDefault>
+            <app-user-posts [uid]="uid"></app-user-posts>
+          </ng-container>
+        </ng-container>
+      </div>
+    </ng-container>
+  </div>
+  <a
+    hidden
+    #callNumber
+    *ngIf="user"
+    href="tel:+{{ user.mobile || user.phone }}"
+  ></a>
+
+  <!-- <ion-menu-button class="writer" menu="second" autoHide="true">
+  <img  alt="appicon" src="assets/images/pull.png"/>
+</ion-menu-button> -->
+</ion-content>
+
+<ion-toolbar color="favorite">
+  <ion-tabs>
+    <ion-tab-bar slot="bottom">
+      <ion-tab-button routerLink="/feed" routerDirection="forward">
+        <ion-icon name="home" style="width: 28px; height: 50px;"></ion-icon>
+      </ion-tab-button>
+
+      <ion-tab-button routerLink="/music" routerDirection="forward">
+        <ion-icon
+          name="ios-create"
+          style="width: 28px; height: 50px;"
+        ></ion-icon>
+      </ion-tab-button>
+
+      <ion-tab-button routerLink="/people" routerDirection="forward">
+        <ion-icon
+          name="ios-people"
+          style="width: 35px; height: 50px;"
+        ></ion-icon>
+      </ion-tab-button>
+    </ion-tab-bar>
+  </ion-tabs>
+</ion-toolbar>

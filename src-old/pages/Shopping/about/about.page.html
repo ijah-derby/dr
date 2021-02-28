@@ -1,0 +1,186 @@
+<ion-header>
+	<ion-toolbar>
+		<ion-buttons slot="start" class="ion-no-padding ion-no-margin">
+			<ion-back-button class="ion-no-padding ion-no-margin">
+				<!-- <ion-icon style="color: black;font-size: 26px;margin-left: 4px;" src="../../../assets/icons/chevron-back.svg" (click)="goBack()"></ion-icon> -->
+			</ion-back-button>
+			<ion-menu-button menu="shop">
+			</ion-menu-button>
+		  </ion-buttons>
+
+		<ion-title>About</ion-title>
+	</ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+	<br>
+	<h2 class="uppercase fw-600 spacing2 pdr-50 txt1">Beautiful and outstanding image about us</h2>
+	<br>
+	<div text-right *ngIf="about" class="social flex-row flex-jus-end pdl-25 pdr-25">
+		<span *ngIf="about.facebook != null && about.facebook != '' ">
+			<ion-button fill="clear" (click)="social(about.facebook)" class="flex-1 fs-16 txt3">
+				<ion-icon name="logo-facebook"></ion-icon>
+			</ion-button>
+		</span>
+		<span *ngIf="about.twitter != null && about.twitter != '' ">
+			<ion-button fill="clear" (click)="social(about.twitter)" class="flex-1 fs-16 txt4">
+				<ion-icon name="logo-twitter"></ion-icon>
+			</ion-button>
+		</span>
+		<span *ngIf="about.google_plus != null && about.google_plus != '' ">
+			<ion-button fill="clear" (click)="social(about.google_plus)" class="flex-1 fs-16 txt4">
+				<ion-icon name="logo-google"></ion-icon>
+			</ion-button>
+		</span>
+		<span *ngIf="about.instagram != null && about.instagram != '' ">
+			<ion-button fill="clear" (click)="social(about.instagram)" class="flex-1 fs-16 txt4">
+				<ion-icon name="logo-instagram"></ion-icon>
+			</ion-button>
+		</span>
+		<span *ngIf="about.pinterest != null && about.pinterest != '' ">
+			<ion-button fill="clear" (click)="social(about.pinterest)" class="flex-1 fs-16 txt4">
+				<ion-icon name="logo-pinterest"></ion-icon>
+			</ion-button>
+		</span>
+		<span *ngIf="about.youtube != null && about.youtube != '' ">
+			<ion-button fill="clear" (click)="social(about.youtube)" class="flex-1 fs-16 txt4">
+				<ion-icon name="logo-youtube"></ion-icon>
+			</ion-button>
+		</span>
+	</div>
+	<br>
+	<br>
+	<div class="wrap-top-slide" *ngIf="preview.length > 0">
+		<ion-slides loop="true">
+			<ion-slide *ngFor="let item of preview">
+				<div text-left class="item-slide">
+					<div class="thumb flex-row flex-jus-center flex-ali-center ovfl-hidden">
+						<img src="{{item}}">
+					</div>
+				</div>
+			</ion-slide>
+		</ion-slides>
+	</div>
+
+	<br>
+
+	<div padding class="" *ngIf="about">
+		<h2 class="uppercase fs-16 fw-600 spacing2 txt1">find us</h2>
+		<br>
+		<div class="mgt-20">
+			<h5 class="flex-row flex-ali-start" *ngIf="about.email1 != null && about.email1 != '' ">
+				<ion-icon class="mgr-15 fs-20 txt4" name="md-mail"></ion-icon>
+				<span>
+					<p class="fs-12 mg-0 txt3">Email 1</p>
+					<p class="fs-14 fw-600 mgt-5 mgb-0 txt1">{{about.email1}}</p>
+				</span>
+			</h5>
+			<h5 class="flex-row flex-ali-start" *ngIf="about.email2 != null && about.email2 != '' ">
+				<ion-icon class="mgr-15 fs-20 txt4" name="md-mail"></ion-icon>
+				<span>
+					<p class="fs-12 mg-0 txt3">Email 2</p>
+					<p class="fs-14 fw-600 mgt-5 mgb-0 txt1">{{about.email2}}</p>
+				</span>
+			</h5>
+			<h5 class="flex-row flex-ali-start" *ngIf="about.phone1 != null && about.phone1 != '' ">
+				<ion-icon class="mgr-15 fs-20 txt4" name="md-call"></ion-icon>
+				<span class="flex-1">
+					<p class="fs-12 mg-0 txt3">Phone 1</p>
+					<p class="fs-14 fw-600 mgt-5 mgb-0 txt1">{{about.phone1}}</p>
+				</span>
+				<ion-button size="small" shape="round" class="fs-12" (click)="call(about.phone1)">
+					<ion-icon name="call"></ion-icon>
+				</ion-button>
+			</h5>
+			<h5 class="flex-row flex-ali-start" *ngIf="about.phone2 != null && about.phone2 != '' ">
+				<ion-icon class="mgr-15 fs-20 txt4" name="md-call"></ion-icon>
+				<span class="flex-1">
+					<p class="fs-12 mg-0 txt3">Phone 2</p>
+					<p class="fs-14 fw-600 mgt-5 mgb-0 txt1">{{about.phone2}}</p>
+				</span>
+				<ion-button size="small" shape="round" class="fs-12" (click)="call(about.phone2)">
+					<ion-icon name="call"></ion-icon>
+				</ion-button>
+			</h5>
+			<h5 class="flex-row flex-ali-start" *ngIf="about.address != null && about.address != '' ">
+				<ion-icon class="mgr-15 fs-20 txt4" name="md-pin"></ion-icon>
+				<span>
+					<p class="fs-12 mg-0 txt3">Address</p>
+					<p class="fs-14 fw-600 mgt-5 mgb-0 txt1">{{about.address}}</p>
+				</span>
+			</h5>
+			<h5 class="flex-row flex-ali-start" *ngIf="about.website != null && about.website != '' ">
+				<ion-icon class="mgr-15 fs-20 txt4" name="md-globe"></ion-icon>
+				<span>
+					<p class="fs-12 mg-0 txt3">Website</p>
+					<p class="fs-14 fw-600 mgt-5 mgb-0 txt1">{{about.website}}</p>
+				</span>
+			</h5>
+			<h5 class="flex-row flex-ali-start" *ngIf="about.time_work != null && about.time_work != '' ">
+				<ion-icon class="mgr-15 fs-20 txt4" name="md-time"></ion-icon>
+				<span>
+					<p class="fs-12 mg-0 fs-14 txt3">Time work</p>
+					<p class="fw-600 mgt-5 txt1">{{about.time_work}}</p>
+				</span>
+			</h5>
+		</div>
+	</div>
+
+	<br>
+	
+	<div class="pdl-50" *ngIf="about && about.map != null && about.map != '' ">
+		<div [innerHtml]="about.map"></div>
+	</div>
+
+	<br>
+	<br>
+
+	<div padding>
+		<form (ngSubmit)="submitForm()" [formGroup]="dataForm">
+			<label class="txt-3 fs-12 mgt-10">Full name</label>
+			<ion-item>
+				<ion-input type="text" class="form-control fs-14" formControlName="fullname"></ion-input>
+			</ion-item>
+			<p class="fs-12 mgt-5 txt-danger" *ngIf="!dataForm.controls.fullname.valid && dataForm.controls.fullname.dirty">
+				Please enter a valid fullname.
+			</p>
+
+
+			<br>
+			<label class="txt-3 fs-12 mgt-10">Email</label>
+			<ion-item>
+				<ion-input type="text" class="form-control fs-14" formControlName="email"></ion-input>
+			</ion-item>
+			<p class="fs-12 mgt-5 txt-danger" *ngIf="!dataForm.controls.email.valid && dataForm.controls.email.dirty">
+				Please enter a valid email.
+			</p>
+
+			<br>
+			<label class="txt-3 fs-12 mgt-10">Message</label>
+			<ion-item>
+				<ion-input type="email" class="form-control fs-14" formControlName="message"></ion-input>
+			</ion-item>
+			<p class="fs-12 mgt-5 txt-danger" *ngIf="!dataForm.controls.message.valid && dataForm.controls.message.dirty">
+				Please enter a valid message.
+			</p>
+
+			<div class="mgt-30" text-right>
+				<ion-button shape="round" type="submit" class="btn btn-sm mg-5 btn-success">
+					<ion-icon slot="start" name="ios-send"></ion-icon> Send
+				</ion-button>
+			</div>
+		</form>
+	</div>
+
+	<br>
+	<br>
+
+	<div padding class="pdr-50">
+		<h2 class="uppercase fs-16 fw-600 spacing2">provision</h2>
+		<p class="fs-13 txt2 pdl-15 pdr-30" *ngIf="about">
+			{{about.provision}}
+		</p>
+	</div>
+	<br>
+	<br>
+</ion-content>

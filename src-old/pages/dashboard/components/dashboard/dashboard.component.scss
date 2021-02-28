@@ -1,0 +1,61 @@
+.badge {
+    width: 20px;
+    height: 17px;
+    position: absolute;
+    right: 0;
+    bottom: 8px;
+    font-size: 10px;
+    z-index: 999;
+}
+
+.badgemsg {
+    width: 20px;
+    height: 17px;
+    position: absolute;
+    right: 0;
+    bottom: 8px;
+    font-size: 10px;
+    z-index: 999;
+}
+
+.noti-icon {
+    Padding-top: 0px;
+    position: relative;
+}
+
+ion-badge {
+    position: absolute;
+    right: 0;
+    bottom: 5px;
+    font-size: 10px;
+}
+
+.header {
+    display: none;
+}
+
+.noti-messageicon{
+    Padding-bottom: 7px;
+}
+
+.writer {
+    position: fixed;
+    Top: 55px;
+    right: -8px;
+    z-index: 999; 
+}
+
+@media (min-width:829px) {
+  img#hide {
+    display: none;
+  }
+}
+
+
+.ion-float-right{
+    margin-right: 15px;
+}
+
+.cont {
+ text-align: center;
+}

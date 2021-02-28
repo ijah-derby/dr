@@ -23,7 +23,7 @@
     .image {
       width: 40px;
       height: 40px;
-      border-radius: 6px;
+      border-radius: 100%;
     }
 
     .details {
@@ -129,7 +129,7 @@
 }
 
 .close-icon {
-  font-size: 16px;
+  font-size: 20px;
   color: red;
   position: relative;
   top: 15px;

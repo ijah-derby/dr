@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from "@angular/core";
 import {
   Action,
   AngularFirestore,
@@ -6,25 +6,34 @@ import {
   AngularFirestoreDocument,
   DocumentChangeAction,
   DocumentSnapshotDoesNotExist,
-  DocumentSnapshotExists
-} from '@angular/fire/firestore';
-import { AngularFireStorage } from '@angular/fire/storage';
-import * as firebase from 'firebase/app';
-import { from, Observable, BehaviorSubject } from 'rxjs';
-import { expand, map, mergeMap, take, takeWhile, tap, finalize } from 'rxjs/operators';
-import {Upload} from '../../helpers/upload';
-import { AlertController } from '@ionic/angular';
+  DocumentSnapshotExists,
+} from "@angular/fire/firestore";
+import { AngularFireStorage } from "@angular/fire/storage";
+import * as firebase from "firebase/app";
+import { from, Observable, BehaviorSubject } from "rxjs";
+import {
+  expand,
+  map,
+  mergeMap,
+  take,
+  takeWhile,
+  tap,
+  finalize,
+} from "rxjs/operators";
+import { Upload } from "../../helpers/upload";
+import { AlertController } from "@ionic/angular";
+import { AuthService } from "src/pages/auth/services/auth/auth.service";
+import { ToastService } from "src/app/services/toast.service";
 
 type CollectionPredicate<T> = string | AngularFirestoreCollection<T>;
 type DocPredicate<T> = string | AngularFirestoreDocument<T>;
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class FirestoreService {
-
-  public progressMsg = 'Please Wait...';
-  public progressVal = 0;
+  public progressMsg = "Please Wait...";
+  public progressVal = new BehaviorSubject(0);
   public isProgress = false;
   private alert;
 
@@ -38,8 +47,9 @@ export class FirestoreService {
   constructor(
     private afs: AngularFirestore,
     private afStorage: AngularFireStorage,
-    private alertCtrl: AlertController) {
-  }
+    private alertCtrl: AlertController,
+    private toast: ToastService
+  ) {}
 
   /// **************
   /// Get a Reference
@@ -49,12 +59,18 @@ export class FirestoreService {
     return this.afs.createId();
   }
 
-  public col<T>({ ref, queryFn }: { ref: CollectionPredicate<T>; queryFn?: any }): AngularFirestoreCollection<T> {
-    return typeof ref === 'string' ? this.afs.collection<T>(ref, queryFn) : ref;
+  public col<T>({
+    ref,
+    queryFn,
+  }: {
+    ref: CollectionPredicate<T>;
+    queryFn?: any;
+  }): AngularFirestoreCollection<T> {
+    return typeof ref === "string" ? this.afs.collection<T>(ref, queryFn) : ref;
   }
 
   public doc<T>(ref: DocPredicate<T>): AngularFirestoreDocument<T> {
-    return typeof ref === 'string' ? this.afs.doc<T>(ref) : ref;
+    return typeof ref === "string" ? this.afs.doc<T>(ref) : ref;
   }
 
   /// **************
@@ -65,9 +81,15 @@ export class FirestoreService {
     return this.doc(ref)
       .snapshotChanges()
       .pipe(
-        map((doc: Action<DocumentSnapshotDoesNotExist | DocumentSnapshotExists<T>>) => {
-          return { id: doc.payload.id, ...(doc.payload.data() as T) };
-        })
+        map(
+          (
+            doc: Action<
+              DocumentSnapshotDoesNotExist | DocumentSnapshotExists<T>
+            >
+          ) => {
+            return { id: doc.payload.id, ...(doc.payload.data() as T) };
+          }
+        )
       );
   }
 
@@ -76,13 +98,18 @@ export class FirestoreService {
       .snapshotChanges()
       .pipe(
         map((docs: Array<DocumentChangeAction<T>>) => {
-          return docs.map((a: DocumentChangeAction<T>) => a.payload.doc.data()) as T[];
+          return docs.map((a: DocumentChangeAction<T>) =>
+            a.payload.doc.data()
+          ) as T[];
         })
       );
   }
 
   /// with Ids
-  public colWithIds$<T>(ref: CollectionPredicate<T>, queryFn?): Observable<any[]> {
+  public colWithIds$<T>(
+    ref: CollectionPredicate<T>,
+    queryFn?
+  ): Observable<any[]> {
     return this.col({ ref, queryFn })
       .snapshotChanges()
       .pipe(
@@ -91,7 +118,7 @@ export class FirestoreService {
             const data: any = a.payload.doc.data() as T;
             const id = a.payload.doc.id;
             const doc = a.payload.doc;
-            return {doc, id, ...data };
+            return { doc, id, ...data };
           });
         })
       );
@@ -104,7 +131,7 @@ export class FirestoreService {
       {
         ...data,
         updatedAt: timestamp,
-        createdAt: timestamp
+        createdAt: timestamp,
       },
       { merge: true }
     );
@@ -120,7 +147,7 @@ export class FirestoreService {
 
   public updateCounter<T>(ref: DocPredicate<T>, data: any): Promise<void> {
     return this.doc(ref).update({
-      ...data
+      ...data,
     });
   }
 
@@ -128,12 +155,28 @@ export class FirestoreService {
     return this.doc(ref).delete();
   }
 
-  public add<T>(ref: CollectionPredicate<T>, data): Promise<firebase.firestore.DocumentReference> {
+  public add<T>(
+    ref: CollectionPredicate<T>,
+    data
+  ): Promise<firebase.firestore.DocumentReference> {
     const timestamp = this.timestamp;
     return this.col({ ref }).add({
       ...data,
       updatedAt: timestamp,
-      createdAt: timestamp
+      createdAt: timestamp,
+    });
+  }
+
+  public async getUserFriends(uid: string) {
+    return new Promise((resolve, reject) => {
+      this.doc$(`friends/${uid}`).subscribe(
+        (ref: any) => {
+          resolve(ref);
+        },
+        (err) => {
+          reject(err);
+        }
+      );
     });
   }
 
@@ -143,14 +186,17 @@ export class FirestoreService {
 
   /// If doc exists update, otherwise set
   public upsert<T>(ref: DocPredicate<T>, data: any): Promise<void> {
-    const doc = this.doc(ref)
-      .snapshotChanges()
-      .pipe(take(1))
-      .toPromise();
+    const doc = this.doc(ref).snapshotChanges().pipe(take(1)).toPromise();
 
-    return doc.then((snap: Action<DocumentSnapshotDoesNotExist | DocumentSnapshotExists<T>>) => {
-      return snap.payload.exists ? this.update(ref, data) : this.set(ref, data);
-    });
+    return doc.then(
+      (
+        snap: Action<DocumentSnapshotDoesNotExist | DocumentSnapshotExists<T>>
+      ) => {
+        return snap.payload.exists
+          ? this.update(ref, data)
+          : this.set(ref, data);
+      }
+    );
   }
 
   /// *************
@@ -161,18 +207,23 @@ export class FirestoreService {
    * if image is a URI, encode to data_url and upload using putString function in firebase storage reference
    * if image isn't a URI just call putString without encoding
    */
-  public uploadImage(imageURI: string, filename: string, store: string, isURI = false): Promise<any> {
+  public uploadImage(
+    imageURI: string,
+    filename: string,
+    store: string,
+    isURI = false
+  ): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       const name = `${store}/${filename}`;
       const storageRef = this.afStorage.storage.ref();
       const imageRef = storageRef.child(name);
       if (isURI) {
-        console.log('isURI', imageURI);
+        console.log("isURI", imageURI);
         this.encodeImageUri(imageURI, (image64: string) => {
           this.uploadWithPutString(imageRef, image64, name, resolve, reject);
         });
       } else {
-        console.log('no isURI');
+        console.log("no isURI");
         this.uploadWithPutString(imageRef, imageURI, name, resolve, reject);
       }
     });
@@ -181,13 +232,16 @@ export class FirestoreService {
   /** upload a file to firebase and save file metadata in files document */
   public uploadFile(upload: Upload, store: string) {
     const storageRef = this.afStorage.storage.ref();
-    const uploadTask = storageRef.child(`${store}/${upload.file.name}`).put(upload.file);
+    const uploadTask = storageRef
+      .child(`${store}/${upload.file.name}`)
+      .put(upload.file);
 
     return uploadTask.on(
       firebase.storage.TaskEvent.STATE_CHANGED,
       (snapshot) => {
         // upload in progress
-        upload.progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        upload.progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
       },
       (error) => {
         // upload failed
@@ -208,7 +262,9 @@ export class FirestoreService {
   public async deleteUpload(url: string) {
     const token = this.getDownloadToken(url);
     if (token) {
-      return this.doc$<{ name: string; url: string }>(`files/${token}`).subscribe(async (file) => {
+      return this.doc$<{ name: string; url: string }>(
+        `files/${token}`
+      ).subscribe(async (file) => {
         await this.deleteFileData(token);
         return await this.deleteFileStorage(file.name);
       });
@@ -216,16 +272,19 @@ export class FirestoreService {
   }
 
   /** encode uri to data url */
-  public encodeImageUri(imageUri: string, callback: { (image64: any): void; (arg0: any): void }) {
-    const c = document.createElement('canvas');
-    const ctx = c.getContext('2d');
+  public encodeImageUri(
+    imageUri: string,
+    callback: { (image64: any): void; (arg0: any): void }
+  ) {
+    const c = document.createElement("canvas");
+    const ctx = c.getContext("2d");
     const img = new Image();
-    img.onload = function() {
+    img.onload = function () {
       const aux: any = this;
       c.width = aux.width;
       c.height = aux.height;
       ctx.drawImage(img, 0, 0);
-      const dataURL = c.toDataURL('image/jpeg');
+      const dataURL = c.toDataURL("image/jpeg");
       callback(dataURL);
     };
     img.src = imageUri;
@@ -241,10 +300,16 @@ export class FirestoreService {
       .snapshotChanges()
       .pipe(
         take(1),
-        tap((d: Action<DocumentSnapshotDoesNotExist | DocumentSnapshotExists<any>>) => {
-          const tock = new Date().getTime() - tick;
-          console.log(`Loaded Document in ${tock}ms`, d);
-        })
+        tap(
+          (
+            d: Action<
+              DocumentSnapshotDoesNotExist | DocumentSnapshotExists<any>
+            >
+          ) => {
+            const tock = new Date().getTime() - tick;
+            console.log(`Loaded Document in ${tock}ms`, d);
+          }
+        )
       )
       .subscribe();
   }
@@ -302,13 +367,20 @@ export class FirestoreService {
   }
 
   public getSpecificDoc<T>(ref: DocPredicate<T>): Observable<T> {
-    return this.doc<T>(ref).snapshotChanges()
-        .pipe(
-            take(1),
-            map((doc: Action<DocumentSnapshotDoesNotExist | DocumentSnapshotExists<T>>) => {
-              return { id: doc.payload.id, ...(doc.payload.data() as T) };
-            }),
+    return this.doc<T>(ref)
+      .snapshotChanges()
+      .pipe(
+        take(1),
+        map(
+          (
+            doc: Action<
+              DocumentSnapshotDoesNotExist | DocumentSnapshotExists<T>
+            >
+          ) => {
+            return { id: doc.payload.id, ...(doc.payload.data() as T) };
+          }
         )
+      );
   }
 
   /** upload image base64 string to firebase storage using putString method */
@@ -319,7 +391,7 @@ export class FirestoreService {
     resolve: (value?: any) => void,
     reject: (reason?: any) => void
   ) {
-    imageRef.putString(imageURI, 'data_url').then(
+    imageRef.putString(imageURI, "data_url").then(
       async (url) => {
         this.saveFileData({ name, url: await imageRef.getDownloadURL() });
         resolve(imageRef.getDownloadURL());
@@ -331,49 +403,56 @@ export class FirestoreService {
   }
 
   /** upload image base64 string to firebase storage using putString method */
-  public uploadVideoString(
-    imageURI: string,
-    name: string
-  ) {
+  public uploadVideoString(imageURI: string, name: string) {
     this.progressMsg = "Preparing Video...";
     const storageRef = this.afStorage.storage.ref();
-    const imageRef = storageRef.child('videos').child(name);
-    let task = imageRef.putString(imageURI, 'data_url');
-  
+    const imageRef = storageRef.child("videos").child(name);
+    let task = imageRef.putString(imageURI, "data_url");
+
     // this.displayAlert();
-    task.on('state_changed', (snapshot) => {
-      this.isProgress = true;
-      // Observe state change events such as progress, pause, and resume
-      // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-      var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-      this.progressMsg = Math.trunc(progress) + '% uploaded...';
-      this.progressVal = Math.trunc(progress);
-      console.log(this.progressMsg);
-      switch (snapshot.state) {
-        case firebase.storage.TaskState.PAUSED: // or 'paused'
-          console.log('Upload is paused');
-          break;
-        case firebase.storage.TaskState.RUNNING: // or 'running'
-          console.log('Upload is running');
-          break;
-      }
-    }, (error)  =>{
-      // Handle unsuccessful uploads
-      this.isProgress = false;
-      this.progressMsg = "Please wait...";
-      this.progressVal = 0;
-    },() => {
-      // Handle successful uploads on complete
-      // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-      task.snapshot.ref.getDownloadURL().then((downloadURL) => {
-        console.log('File available at', downloadURL);
-        this.progressMsg = 'Finishing...';
-        this.isProgress = false;
-        this.progressVal = 0;
+    task.on(
+      "state_changed",
+      (snapshot) => {
+        this.isProgress = true;
+        // Observe state change events such as progress, pause, and resume
+        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+        var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        this.progressMsg = Math.trunc(progress) + "% uploaded...";
+        this.progressVal.next(Math.trunc(progress));
         console.log(this.progressMsg);
-      });
-    });
-    
+        this.progressVal.subscribe(resp => {
+          if(resp > 0) {
+            this.toast.show(resp + "% file uploaded", 10);
+          }
+        })
+        switch (snapshot.state) {
+          case firebase.storage.TaskState.PAUSED: // or 'paused'
+            console.log("Upload is paused");
+            break;
+          case firebase.storage.TaskState.RUNNING: // or 'running'
+            console.log("Upload is running");
+            break;
+        }
+      },
+      (error) => {
+        // Handle unsuccessful uploads
+        this.isProgress = false;
+        this.progressMsg = "Please wait...";
+        this.progressVal.next(0);
+      },
+      () => {
+        // Handle successful uploads on complete
+        // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+        task.snapshot.ref.getDownloadURL().then((downloadURL) => {
+          console.log("File available at", downloadURL);
+          this.progressMsg = "Finishing...";
+          this.isProgress = false;
+          this.progressVal.next(0);
+          console.log(this.progressMsg);
+        });
+      }
+    );
+
     return task.then(
       async (url) => {
         // task.on('state_changed', snap => {
@@ -387,7 +466,7 @@ export class FirestoreService {
         console.log(err);
         this.isProgress = false;
         this.progressMsg = "Please wait...";
-        this.progressVal = 0;
+        this.progressVal.next(0);
         // this.alert.dismiss();
         return err;
       }
@@ -396,9 +475,9 @@ export class FirestoreService {
 
   private async displayAlert() {
     this.alert = await this.alertCtrl.create({
-      header: 'Video Uploading',
-      message: 'this.progressMsg',
-      backdropDismiss: false
+      header: "Video Uploading",
+      message: "this.progressMsg",
+      backdropDismiss: false,
     });
     this.alert.present();
   }
@@ -406,7 +485,7 @@ export class FirestoreService {
   /** get token from url query param */
   private getDownloadToken(url) {
     const urlParams = new URLSearchParams(url);
-    return urlParams.get('token');
+    return urlParams.get("token");
   }
 
   // add files details from the realtime db
@@ -424,15 +503,14 @@ export class FirestoreService {
   // Firebase files must have unique names in their respective storage dir
   // So the name serves as a unique key
   private async deleteFileStorage(name: string) {
-    return await this.afStorage.storage
-      .ref()
-      .child(`${name}`)
-      .delete();
+    return await this.afStorage.storage.ref().child(`${name}`).delete();
   }
 
   // Detects documents as batched transaction
   private deleteBatch(path: string, batchSize: number): Observable<any> {
-    const colRef = this.afs.collection(path, (ref) => ref.orderBy('__name__').limit(batchSize));
+    const colRef = this.afs.collection(path, (ref) =>
+      ref.orderBy("__name__").limit(batchSize)
+    );
 
     return colRef.snapshotChanges().pipe(
       take(1),

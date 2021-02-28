@@ -1,0 +1,23 @@
+<ion-toolbar class="tool" color="favorite">
+  <ion-buttons slot="start">
+    <!-- <ion-menu-button menu="first" color="medium" size="small" autoHide="true"></ion-menu-button> -->
+    <ion-icon
+    style="color: #351010; font-size: 26px; margin-left: 12px;"
+    icon="../../../../assets/icons/chevron-back.svg"
+    (click)="goBack()"
+  ></ion-icon>
+  </ion-buttons>
+    <ion-buttons slot="end">
+    <img
+      id="hide"
+      alt="appicon"
+      height="22"
+      class="ion-float-right"
+      src="assets/images/logo1.png"
+    />
+  </ion-buttons>
+</ion-toolbar>
+
+<ion-content>
+  <iframe style="width: 100%; height: 100vh; position: relative; left: 0px; margin: 0; padding: 0; z-index: 999;" src="https://dontramp.com/hq/knowledge" allow="fullscreen" scrolling="yes" frameborder="0"></iframe>
+</ion-content>

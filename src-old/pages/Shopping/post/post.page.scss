@@ -1,0 +1,18 @@
+.item-related{
+	display: flex;
+	align-items: center;
+	.thumb{
+		width: 80px;
+		height: 70px;
+	}
+	.description{
+		flex: 1;
+	}
+}
+.social-share{
+	display: flex;
+	align-items: center;
+	.btn-social{
+		flex: 1;
+	}
+}

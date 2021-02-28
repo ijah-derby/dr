@@ -8,6 +8,11 @@
     z-index: 999;
 }
 
+.content-scroll {
+    height: calc(100% - 0px) !important;
+    width: 100%;
+  }
+
 .badgemsg {
     width: 20px;
     height: 17px;
@@ -38,12 +43,6 @@ ion-badge {
     Padding-bottom: 7px;
 }
 
-.writer {
-    position: fixed;
-    Top: 55px;
-    right: -8px;
-    z-index: 999; 
-}
 
 @media (min-width:829px) {
   img#hide {
@@ -59,3 +58,20 @@ ion-badge {
 .cont {
  text-align: center;
 }
+
+.cart {
+    color: black;
+    font-size: 24px;
+    margin-right: 20px;
+  }
+  
+  .headphones {
+    color: black;
+    font-size: 23px;
+   
+    margin-left: 10px;
+  }
+  
+  .tool {
+    box-shadow: 0px 0.2px 0px #a8a8a8!important;
+  }

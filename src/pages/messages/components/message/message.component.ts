@@ -1,19 +1,19 @@
-import { AfterContentChecked, Component, ElementRef, Injector, OnInit, ViewChild } from '@angular/core';
-import { NavParams, NavController } from '@ionic/angular';
-import { messages } from 'src/assets/data/message';
-import { IUser } from 'src/pages/auth/helpers/model';
-import { AuthService } from 'src/pages/auth/services/auth/auth.service';
-import { SettingService } from 'src/pages/setting/services/setting/setting.service';
-import { INoData } from 'src/shared/components/no-data/no-data.component';
+import { Component, OnInit, ViewChild, ElementRef, Injector } from '@angular/core';
+import { Camera } from '@ionic-native/camera/ngx';
+import { ActionSheetController, AlertController, ModalController, IonContent } from '@ionic/angular';
+import { AngularFireDatabase } from '@angular/fire/database';
+import { Router, ActivatedRoute } from '@angular/router';
+import { Geolocation } from '@ionic-native/geolocation/ngx';
+import * as firebase from "firebase/app";
+import 'firebase/auth';
+import { LoaderService } from 'src/app/services/loader.service';
+import { DataService } from 'src/app/services/data.service';
+import { ImageService } from 'src/app/services/image.service';
 import { Extender } from 'src/shared/helpers/extender';
-import { GalleryPickerComponent } from 'src/shared/modals/gallery-picker/gallery-picker.component';
-import { ImagePreviewComponent } from 'src/shared/modals/image-preview/image-preview.component';
-import { CommonService } from 'src/shared/services/common/common.service';
+import { FeedAddComponent } from 'src/pages/feed/components/feed-add/feed-add.component';
+import { AuthService } from 'src/pages/auth/services/auth/auth.service';
+import { IUser } from 'src/pages/auth/helpers/model';
 import { FirestoreService } from 'src/shared/services/firestore/firestore.service';
-import { CHAT_TYPES, IChat, IMessage } from '../../models/message';
-import { MessagesService } from '../../services/messages/messages.service';
-import { AngularFirestore } from '@angular/fire/firestore';
-import { ActivatedRoute } from '@angular/router';
 
 /**
  * send messages between users. as a user, you can deactivate autoreply in setting page.
@@ -23,300 +23,336 @@ import { ActivatedRoute } from '@angular/router';
  * check readme for info on cloud functions
  */
 @Component({
-  selector: 'app-message',
-  templateUrl: './message.component.html',
-  styleUrls: ['./message.component.scss']
+  selector: "app-message",
+  templateUrl: "./message.component.html",
+  styleUrls: ["./message.component.scss"],
 })
-export class MessageComponent extends Extender implements OnInit, AfterContentChecked {
-  public message: IMessage;
-  public currentUser: IUser;
-  public chat: IChat[] = [];
-  public chatType = CHAT_TYPES;
-  public textMsg: string = '';
-  public images: string[] = [];
-  public sendLoading: boolean;
-  active = 0;
-  public noDataconfig: INoData = {
-    content: { title: 'Its quite here', description: 'start a conversation' }
-  };
-  @ViewChild('content', null) public content: ElementRef;
-  @ViewChild('callNumber', null) public callNumber: ElementRef;
-  @ViewChild('fileInputButton', null) private fileInputButton: ElementRef;
+export class MessageComponent extends Extender implements OnInit {
+    @ViewChild(IonContent, null) contentArea: IonContent;
 
-  constructor(
-    protected injector: Injector,
-    private navParams: NavParams,
-    private authService: AuthService,
-    private commonService: CommonService,
-    private firestoreService: FirestoreService,
-    private messageService: MessagesService,
-    private settingService: SettingService,
-    private firestore: AngularFirestore,
-    private navCtrl: ActivatedRoute
-  ) {
-    super(injector);
-  }
+    userId: any;
+    title: any;
+    message: any;
+    conversationId: any;
+    messages: any;
+    updateDateTime: any;
+    messagesToShow: any;
+    startIndex: any = -1;
+    // Set number of messages to show.
+    numberOfMessages = 10;
+    loggedInUserId: any;
 
-  public async ngOnInit() {
-    this.active = 1;
-    this.loading = true;
-    this.currentUser = await this.authService.getUser();
-    this.subscriptions.push(
-      this.messageService.getMessage(this.navParams.get('data')).subscribe(
-        (msg) => {
-          this.message = msg;
-          this.chat = this.message.messages;
-          this.loading = false;
-          console.log(this.message, this.chat);
-          this.resetCounter();
-        },
-        (err) => {
-          this.loading = false;
-          this.toast(err);
-        }
-      )
-    );
-  }
-
-  ionViewWillLeave() {
-    this.active = 0;
-    this.resetCounter();
-    console.log('reset on leave');
-  }
-
-  /** scroll to bottom when view loads with messages */
-  public ngAfterContentChecked() {
-    this.scrollToBottom();
-  }
-
-  /*
-  reseting unread counter on page resume
-  */
-
-  private async resetCounter() {
-    if (this.message != null || this.message != undefined) {
-      let snap = await this.firestore.doc(`messages/${this.message.id}`).valueChanges();
-      await snap.forEach(async data => {
-        let obj = data as IMessage;
-        if(this.active == 1 && obj.last_sender != undefined && obj.last_sender != this.currentUser.uid && obj.seen != undefined && obj.seen != true) {
-          await this.firestoreService.updateCounter(`messages/${this.message.id}`, {
-            unread_count: 0,
-            seen: true
-          });
-          console.log('counter_reset');
-        } else {
-          console.log("no reset counter")
-        }
+    currentUser: IUser;
+  
+    // MessagePage
+    // This is the page where the user can chat with a friend.
+    constructor(
+      // public navCtrl: NavController,
+      // public navParams: NavParams,
+      protected injector: Injector,
+      private route: ActivatedRoute,
+      private dataProvider: DataService,
+      private angularfire: AngularFireDatabase,
+      private loadingProvider: LoaderService,
+      private imageProvider: ImageService,
+      private camera: Camera,
+      private actionSheet: ActionSheetController,
+      private geolocation: Geolocation,
+      private authService: AuthService,
+      private firestore: FirestoreService
+    ) { 
+      super(injector);
+      this.route.paramMap.subscribe(params => {
+        this.userId = params.get("id");
       });
     }
-  }
+  
+    ngOnInit() {
+  
+    }
+  
+    async ionViewDidEnter() {
+      this.loggedInUserId = firebase.auth().currentUser.uid;
 
-  /**
-   * used in template to retrieve details of receiving user for the message
-   * if currentUser's id doesn't match another user in list, get the other users data as a recipient
-   */
-  public getSender(message: IMessage) {
-    return message ? message.participants.find((user: IUser) => user.uid !== this.currentUser.uid) : null;
-  }
-
-  /**
-   * used in template to retrieve details of receiving user for the message
-   * if currentUser's id match another user in list, get the other users data as a recipient
-   */
-  public getRecipient(message: IMessage) {
-    return message ? message.participants.find((user: IUser) => user.uid === this.currentUser.uid) : null;
-  }
-
-  /** call sender user */
-  public call() {
-    this.commonService.callUser(this.getSender(this.message).mobile || this.getSender(this.message).phone, this.callNumber);
-  }
-
-  /** on message press show options is action sheet */
-  public async onMessageHold(data: IChat) {
-    if (data.uid === this.currentUser.uid) {
-      const actionSheet = await this.actionSheetCtrl.create({
-        header: 'Chat Options',
-        buttons: [
-          {
-            text: 'Delete',
-            role: 'Destructive',
-            handler: () => {
-              this.messageService
-                .deleteChat(this.message, data)
-                .then(() => this.scrollToBottom())
-                .catch((err) => this.failPromise(err));
+      this.currentUser = await this.authService.getUser();
+      
+      // Get friend details.
+      this.dataProvider.getUser(this.userId).subscribe((user: any) => {
+        this.title = user.displayName;
+      });
+  
+      // Get conversationInfo with friend.
+      this.firestore.doc$('users/' + this.loggedInUserId + '/conversations/' + this.userId).subscribe((conversation: any) => {
+        if (conversation) {
+          // User already have conversation with this friend, get conversation
+          this.conversationId = conversation.conversationId;
+  
+          // Get conversation
+          this.dataProvider.getConversationMessages(this.conversationId).subscribe((messagesRes: any[]) => {
+  
+            let messages = messagesRes;
+            if (messages == null)
+              messages = [];
+            if (this.messages) {
+              // Just append newly added messages to the bottom of the view.
+              if (messages.length > this.messages.length) {
+                let message = messages[messages.length - 1];
+  
+                this.dataProvider.getUser(message.sender).subscribe((user: any) => {
+                  message.avatar = user.photoURL;
+                });
+                this.messages.push(message);
+                this.messagesToShow.push(message);
+              }
+            } else {
+              // Get all messages, this will be used as reference object for messagesToShow.
+              this.messages = [];
+              messages.forEach((message) => {
+                this.dataProvider.getUser(message.sender).subscribe((user: any) => {
+                  message.avatar = user.photoURL;
+                });
+                this.messages.push(message);
+              });
+              // Load messages in relation to numOfMessages.
+              if (this.startIndex == -1) {
+                // Get initial index for numberOfMessages to show.
+                if ((this.messages.length - this.numberOfMessages) > 0) {
+                  this.startIndex = this.messages.length - this.numberOfMessages;
+                } else {
+                  this.startIndex = 0;
+                }
+              }
+              if (!this.messagesToShow) {
+                this.messagesToShow = [];
+              }
+              // Set messagesToShow
+              for (var i = this.startIndex; i < this.messages.length; i++) {
+                this.messagesToShow.push(this.messages[i]);
+              }
+              this.loadingProvider.presentProcessingLoading();
             }
-          },
-          {
-            text: 'Close',
-            role: 'cancel',
-            handler: () => {}
-          }
-        ]
-      });
-      await actionSheet.present();
-    }
-  }
-
-  /** send message, update uid property of message, this is needed to find the sender id and send notifications to recipients via firebase cloud functions */
-  public send(text: any, images = null) {
-    const data: IChat = {
-      images,
-      value: text,
-      type: this.chatType.TEXT,
-      sendAt: Date.now(),
-      uid: this.currentUser.uid
-    };
-    this.sendLoading = true;
-    if (text) {
-      this.messageService
-        .send({ ...this.message }, data)
-        .then(() => {
-          this.textMsg = '';
-          this.sendLoading = false;
-          this.autoReply(messages[this.getRandomInt(1, 50)]);
-        })
-        .catch((err) => this.failPromise(err));
-    }
-  }
-
-  /** for browser input file on change, run this method to get base64 string of files
-   * and open gallery modal with the images
-   */
-  public detectFiles(event: any) {
-    this.commonService.getImagesFromFiles(event).then((images) => {
-      this.openGallery(images);
-    });
-  }
-
-  /**
-   * open action sheet with photo upload options, either from camera or library
-   * and run getPictures method
-   */
-  public async sendPhoto() {
-    const actionSheet = await this.actionSheetCtrl.create({
-      header: 'Send Images',
-      buttons: [
-        {
-          text: 'Use Camera',
-          handler: () => {
-            this.getPictures(1);
-          }
-        },
-        {
-          text: 'Use Library',
-          handler: () => {
-            this.getPictures(0, true);
-          }
-        },
-        {
-          text: 'Close',
-          role: 'cancel',
-          handler: () => {}
+          });
         }
-      ]
-    });
-    await actionSheet.present();
-  }
-
-  /** open preview image modal */
-  public async preview(image: string) {
-    const modal = await this.openModal(ImagePreviewComponent, image);
-    modal.present();
-  }
-
-  /** auto reply to message */
-  public autoReply(text: any, images = null) {
-    if (this.settingService.setting.autoReply === true) {
-      setTimeout(() => {
-        const data: IChat = {
-          images,
-          value: text,
-          type: this.chatType.TEXT,
-          sendAt: Date.now(),
-          uid: this.getSender(this.message).uid
-        };
-        this.loading = true;
-        this.messageService
-          .send({ ...this.message }, data)
-          .then(() => (this.loading = false))
-          .catch((err) => this.failPromise(err));
-      }, 6000);
+      });
+  
+      // Update messages' date time elapsed every minute based on Moment.js.
+      var that = this;
+      if (!that.updateDateTime) {
+        that.updateDateTime = setInterval(function () {
+          if (that.messages) {
+            that.messages.forEach((message) => {
+              let date = message.date;
+              message.date = new Date(date);
+            });
+          }
+        }, 60000);
+      }
+  
+      setTimeout(() => this.scrollBottom(), 1000);
     }
-  }
-
-  /**
-   * scroll to bottom of chat
-   */
-  public scrollToBottom(): void {
-    const element = document.getElementById('last-item');
-    if (element) {
-      element.scrollIntoView({
-        behavior: 'auto',
-        block: 'end',
-        inline: 'nearest'
+    // Load previous messages in relation to numberOfMessages.
+    loadPreviousMessages() {
+      var that = this;
+      // Show loading.
+      this.loadingProvider.presentProcessingLoading();
+      setTimeout(function () {
+        // Set startIndex to load more messages.
+        if ((that.startIndex - that.numberOfMessages) > -1) {
+          that.startIndex -= that.numberOfMessages;
+        } else {
+          that.startIndex = 0;
+        }
+        // Refresh our messages list.
+        that.messages = null;
+        that.messagesToShow = null;
+  
+        that.scrollTop();
+  
+        // Populate list again.
+        that.ionViewDidEnter();
+      }, 1000);
+    }
+  
+    // Update messagesRead when user lefts this page.
+    ionViewWillLeave() {
+      this.setMessagesRead();
+    }
+  
+    // Check if currentPage is active, then update user's messagesRead.
+    setMessagesRead() {
+      this.firestore.col$('conversations/' + this.conversationId + '/messages').subscribe((snap: any[]) => {
+  
+        if (snap != null) {
+          this.firestore.update('users/' + this.loggedInUserId + '/conversations/' + this.userId, {messagesRead: snap.length});
+        }
       });
     }
-  }
-
-  /**
-   * get image using native camera plugin to retrieve from either camera or library of device
-   * param type is a number that specifies whether to get from camera or from library
-   * one image retrieved, upload to firebase storage. if error, display a toast with error message
-   */
-  private async getPictures(type: number, multiple = false) {
-    let imageData = [];
-    this.loading = true;
-
-    if ((window as any).cordova) {
-      // if on device use native plugins
-      imageData = await this.commonService.getPictures(type, multiple);
-      await this.openGallery(imageData);
-    } else {
-      // if on device use browser file upload
-      (this.fileInputButton.nativeElement as HTMLInputElement).click();
+  
+    scrollBottom() {
+      setTimeout(() => {
+        if (this.contentArea.scrollToBottom) {
+          this.contentArea.scrollToBottom();
+        }
+      }, 500);
+      this.setMessagesRead();
     }
-  }
-
-  /** open gallery with image files, on dismiss modal, get images and upload them */
-  private async openGallery(imageData: any[]) {
-    if (imageData.length > 0) {
-      const modal = await this.openModal(GalleryPickerComponent, imageData, 'custom-modal');
-      await modal.present();
-      const { data } = await modal.onDidDismiss();
-      if (data.images && data.images.length > 0) {
-        this.uploadImage(data.text, data.images);
+  
+    scrollTop() {
+      setTimeout(() => {
+        if (this.contentArea.scrollToTop) {
+          this.contentArea.scrollToTop();
+        }
+      }, 500);
+    }
+  
+  
+    // Check if the user is the sender of the message.
+    isSender(message) {
+      if (message.sender == this.loggedInUserId) {
+        return true;
       } else {
-        this.toast(this.translate.instant('message.component.no-images-selected'));
+        return false;
       }
     }
-    (this.fileInputButton.nativeElement as HTMLInputElement).value = null;
-  }
-
-  /**
-   * append base 64 string to image data, upload image data to firebase storage.
-   * the upload function returns a download data which is then saved to images
-   */
-  private uploadImage(text: string, imageData: string[]) {
-    this.images = imageData;
-    const read$ = [];
-    this.images.forEach((i) => {
-      read$.push(this.firestoreService.uploadImage(i, `${Date.now()}-${this.currentUser.uid}`, 'chat-images'));
-    });
-
-    Promise.all(read$)
-      .then((res) => {
-        this.images = res;
-        this.send(text, this.images);
-        this.loading = false;
-      })
-      .catch((err) => this.failPromise(err));
-  }
-
-  private failPromise = (err: any) => {
-    this.loading = false;
-    this.sendLoading = false;
-    this.toast(err);
-  };
+  
+  
+    // Send message, if there's no conversation yet, create a new conversation.
+    send(type) {
+      if (this.message) {
+        // User entered a text on messagebox
+        if (this.conversationId) {
+          let messages = JSON.parse(JSON.stringify(this.messages));
+          messages.push({
+            date: new Date().toString(),
+            sender: this.loggedInUserId,
+            type: type,
+            message: this.message
+          });
+  
+          // Update conversation on database.
+          this.firestore.update('conversations/' + this.conversationId, {
+            messages: messages
+          });
+          // Clear messagebox.
+          this.message = '';
+          this.scrollBottom();
+        } else {
+          // New Conversation with friend.
+          var messages = [];
+          messages.push({
+            date: new Date().toString(),
+            sender: this.loggedInUserId,
+            type: type,
+            message: this.message
+          });
+          var users = [];
+          users.push(this.loggedInUserId);
+          users.push(this.userId);
+          // Add conversation.
+          let cid = this.firestore.createId();
+          this.firestore.set('conversations/' + cid, {
+            dateCreated: new Date().toString(),
+            messages: messages,
+            users: users
+          }).then((success) => {
+            let conversationId = cid;
+            this.message = '';
+            // Add conversation reference to the users.
+            this.firestore.update('users/' + this.loggedInUserId + '/conversations/' + this.userId, {
+              conversationId: conversationId,
+              messagesRead: 1
+            });
+            this.firestore.update('users/' + this.userId + '/conversations/' + this.loggedInUserId, {
+              conversationId: conversationId,
+              messagesRead: 0
+            });
+          });
+          this.scrollBottom();
+        }
+      }
+    }
+  
+    viewUser(userId) {
+      this.router.navigateByUrl('userinfo/' + userId);
+    }
+  
+  
+    attach() {
+      this.actionSheet.create({
+        header: 'Choose attachments',
+        buttons: [{
+          text: 'Camera',
+          handler: () => {
+            this.imageProvider.uploadPhotoMessage(this.conversationId, this.camera.PictureSourceType.CAMERA).then((url) => {
+              this.message = url;
+              this.send("image");
+            });
+          }
+        }, {
+          text: 'Photo Library',
+          handler: () => {
+            this.imageProvider.uploadPhotoMessage(this.conversationId, this.camera.PictureSourceType.PHOTOLIBRARY).then((url) => {
+              this.message = url;
+              this.send("image");
+            });
+          }
+        },
+        {
+          text: 'Video',
+          handler: () => {
+            this.imageProvider.uploadVideoMessage(this.conversationId).then(url => {
+              this.message = url;
+              this.send("video");
+            });
+          }
+        }
+          , {
+          text: 'Location',
+          handler: () => {
+            this.geolocation.getCurrentPosition({
+              timeout: 5000
+            }).then(res => {
+              let locationMessage = "Location:<br> lat:" + res.coords.latitude + "<br> lng:" + res.coords.longitude;
+              let mapUrl = "<a href='https://www.google.com/maps/search/" + res.coords.latitude + "," + res.coords.longitude + "'>View on Map</a>";
+  
+              let confirm = this.alertCtrl.create({
+                header: 'Your Location',
+                message: locationMessage,
+                buttons: [{
+                  text: 'cancel',
+                  handler: () => {
+                    console.log("canceled");
+                  }
+                }, {
+                  text: 'Share',
+                  handler: () => {
+                    this.message = locationMessage + "<br>" + mapUrl;
+                    this.send("location");
+                  }
+                }]
+              }).then(r => r.present());
+            }, locationErr => {
+              console.log("Location Error" + JSON.stringify(locationErr));
+            });
+          }
+        }, {
+          text: 'cancel',
+          role: 'cancel',
+          handler: () => {
+            console.log("cancelled");
+          }
+        }]
+      }).then(r => r.present());
+    }
+  
+    // Enlarge image messages.
+    enlargeImage(img) {
+      // this.modalCtrl.create({
+      //   component: ImagemodalPage,
+      //   componentProps: {
+      //     img: img
+      //   }
+      // }).then(res => res.present())
+    }
+  
 }

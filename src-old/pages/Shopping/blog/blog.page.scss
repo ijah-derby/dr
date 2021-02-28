@@ -1,0 +1,34 @@
+.wrap-top-slide{
+	width: 105%;
+	.thumb{
+		height: 130px;
+	}
+}
+.wrap-new-slide{
+	width: 100%;
+	.item-slide{
+		display: flex;
+	}
+	.description{
+		flex: 2;
+	}
+	.thumb{
+		flex: 1;
+		height: 70px;
+	}
+}
+.item-post{
+	.thumb{
+		height: 90px;
+	}
+	.description{
+		h3{
+			height: 32px;
+			overflow: hidden;
+		}
+		p{
+			height: 42px;
+			overflow: hidden;
+		}
+	}
+}

@@ -49,16 +49,16 @@ export class AppService extends Extender {
         icon: 'home',
         image: false
       },
+      {
+        title: this.translate.instant('page-title.dashboard'),
+        component: this.routes.dashboard,
+        icon: 'share-2',
+        image: false
+      },
        {
         title: 'Notifications',
         component: '../beats',
         icon: 'music',
-        image: false
-      },
-      {
-        title: this.translate.instant('page-title.dashboard'),
-        component: this.routes.dashboard,
-        icon: 'calendar',
         image: false
       },
       {
@@ -85,8 +85,8 @@ export class AppService extends Extender {
   /** setup splash screen and status bar */
   public initializeApp() {
     this.platform.ready().then(() => {
-      this.statusBar.styleLightContent();
-      this.statusBar.backgroundColorByHexString('#ed0000');
+      this.statusBar.styleDefault();
+      this.statusBar.backgroundColorByHexString('#ffffff');
       this.splashScreen.hide();
     });
   }

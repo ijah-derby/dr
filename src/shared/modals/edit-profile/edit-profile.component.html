@@ -48,6 +48,11 @@
             ></textarea>
           </form-field>
 
+          <ion-item>
+            <ion-label floating>Company URL</ion-label>
+            <ion-input type="url" name="companyURL" [(ngModel)]="companyURL" value="" required></ion-input>
+            </ion-item>
+
           <!-- country selection -->
           <div class="form-label">{{ 'edit-profile-component.country-label' | translate }}</div>
           <form-field fill="true" color="medium">

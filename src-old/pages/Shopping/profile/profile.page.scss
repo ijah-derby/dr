@@ -1,0 +1,23 @@
+.top-profile{
+
+}
+.thumb-avt{
+	z-index: 100;
+	margin: 0px auto;
+	border-radius: 50%;
+	height: 120px;
+	width: 120px;
+	overflow: hidden;
+	position: relative;
+	border: 3px solid var(--ion-color-light);
+	img{
+		height: 100%;
+		min-width: 100%;
+		max-width: auto;
+	}
+}
+
+.btn-edit{
+	position: relative;
+	z-index: 110;
+}

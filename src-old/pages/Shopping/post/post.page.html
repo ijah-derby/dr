@@ -1,0 +1,61 @@
+<ion-header>
+  <ion-toolbar>
+     <ion-buttons slot="start">
+      <ion-back-button class="fs-24 txt1" text="" icon="ios-arrow-round-back"></ion-back-button>
+    </ion-buttons>
+
+    <ion-title>Post</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+	<div class="">
+		<img src="{{obj.thumb}}">
+	</div>
+	<br>
+	<div padding class="">
+		<h2 class="txt1 fw-600 spacing1">{{obj.name}}</h2>
+		<p class="txt-b3">Posted {{obj.created.substring(4, 15)}}</p>
+		<p class="txt-b2">{{obj.content}}</p>
+	</div>
+
+	<div padding class="social-share">
+		<h4 class="mg-0 uppercase fs-14 spacing-1">share with:</h4>
+		<div class="btn-social" text-right>
+			<ion-button fill="clear" size="small" (click)="share(obj.link_share)" class="txt1">
+				<ion-icon name="logo-facebook"></ion-icon>
+			</ion-button>
+			<ion-button fill="clear" size="small" (click)="share(obj.link_share)" class="txt1">
+				<ion-icon name="logo-twitter"></ion-icon>
+			</ion-button>
+			<ion-button fill="clear" size="small" (click)="share(obj.link_share)" class="txt1">
+				<ion-icon name="logo-google"></ion-icon>
+			</ion-button>
+			<ion-button fill="clear" size="small" (click)="share(obj.link_share)" class="txt1">
+				<ion-icon name="logo-instagram"></ion-icon>
+			</ion-button>
+		</div>
+	</div>
+
+	<br/>
+	<br/>
+
+	<div padding class="" *ngIf="list_related.length > 0">
+		<h2 class="uppercase fs-14 spacing-1">related articles</h2>
+		<br>
+		<div class="item-related mgb-20" *ngFor="let item of list_related" [routerLink]="['/post', item]">
+			<div class="thumb ovfl-hidden">
+				<img src="{{item.thumb}}">	
+			</div>
+			<div class="description ovfl-hidden pdl-10">
+				<h4 class="ellipsis fs-16 mgb-0">{{item.name}}</h4>
+				<p class="fs-12 txt-b3 mg-0">{{item.created.substring(4, 15)}}</p>
+				<p class="ellipsis txt-b2 mg-0">{{item.description}}</p>
+			</div>
+		</div>
+		<br>
+	</div>
+
+	<br>
+	<br>
+</ion-content>

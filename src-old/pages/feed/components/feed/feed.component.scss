@@ -1,0 +1,86 @@
+:host {
+  .content-wrapper {
+
+    .title {
+      align-items: center;
+
+      small {
+        font-size: 50%;
+        margin-left: 10px;
+      }
+    }
+
+    .wrapper {
+      display: flex;
+      height: 100%;
+
+      .content-scroll {
+        height: calc(100% - 0px) !important;
+        width: 100%;
+      }
+    }
+  }
+}
+
+.ion-float-right{
+margin-right: 15px;
+}
+
+
+.badge {
+    width: 20px;
+    height: 17px;
+    position: absolute;
+    right: 0;
+    bottom: 8px;
+    font-size: 10px;
+    z-index: 999;
+}
+
+.badgemsg {
+    width: 20px;
+    height: 17px;
+    position: absolute;
+    right: 0;
+    bottom: 8px;
+    font-size: 10px;
+    z-index: 999;
+}
+
+
+
+
+ion-badge {
+  position: absolute;
+  right: 0;
+  bottom: 5px;
+  font-size: 10px;
+}
+
+
+.writer {
+    position: fixed;
+    Top: 55px;
+    right: -8px;
+    z-index: 999; 
+}
+
+.down{
+ display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
+
+@media (min-width:829px) {
+  img#hide {
+    display: none;
+  }
+}
+
+.cart-icon {
+  color: black;
+  font-size: 20px;
+  margin-left: 15px;
+}
+

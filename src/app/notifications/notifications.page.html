@@ -1,14 +1,30 @@
-<ion-toolbar color="favorite">
+<ion-toolbar class="tool" color="favorite">
   <ion-buttons slot="start">
-    <ion-menu-button color="medium" size="small" autoHide="true"></ion-menu-button>
+    <ion-icon
+    src="assets/icons/menu-outline.svg"
+    color="danger"
+      style="font-size: 25px; padding-left: 10px; color: black;"
+      (click)="openMenu()"
+    ></ion-icon>
+    <ion-menu-button class="headphones" menu="second" autoHide="true">
+      <ion-icon src="assets/icons/play-outline.svg" color="medium"></ion-icon>
+    </ion-menu-button>
+    <ion-icon
+    src="assets/icons/trash-outline.svg"
+    color="primary"
+      (click)="deleteAllConfirm()"
+      style="color: gray; font-size: 19px;"
+    ></ion-icon>
   </ion-buttons>
-  <img id="hide" alt="appicon" height="22" style="margin-right: 10px;" class="ion-float-right" src="assets/images/logo1.png"/>
-
+  <img
+    id="hide"
+    alt="appicon"
+    height="22"
+    style="margin-right: 10px;"
+    class="ion-float-right"
+    src="assets/images/logo1.png"
+  />
 </ion-toolbar>
-
- <ion-menu-button class="writer" menu="second" autoHide="true">
-  <img  alt="appicon" src="assets/images/pull.png"/>
-</ion-menu-button>
 
 <ion-content>
   <ion-grid>
@@ -20,29 +36,59 @@
         <ion-icon name="search" size="large" (click)="search = !search"></ion-icon>
       </ion-col> -->
     </ion-row>
-<!--    <ion-row>-->
-<!--      <ion-col>-->
-<!--        <ion-searchbar animated="true" showCancelButton="focus" value="Search here..." *ngIf="search"></ion-searchbar>-->
-<!--      </ion-col>-->
-<!--    </ion-row>-->
+    <!--    <ion-row>-->
+    <!--      <ion-col>-->
+    <!--        <ion-searchbar animated="true" showCancelButton="focus" value="Search here..." *ngIf="search"></ion-searchbar>-->
+    <!--      </ion-col>-->
+    <!--    </ion-row>-->
   </ion-grid>
 
   <ion-list lines="none">
-     <ion-item-sliding *ngFor="let item of notifications; let i = index;">
-
+    <ion-item-sliding *ngFor="let item of notifications; let i = index;">
       <!-- *ngIf="(item.by != currentUser.uid && item.type == 2) || (item.by == currentUser.uid && item.type != 2)" -->
-      <ion-item class="ion-no-margin ion-no-padding" (click)="goToPage(item)">
+      <ion-item
+        class="ion-no-margin ion-no-padding"
+        *ngIf="!item.deletedBy || !item.deletedBy.includes(currentUser.uid)"
+      >
         <ion-grid>
           <ion-row>
-            <ion-col size="2">
+            <ion-col size="2" (click)="goToPage(item)">
               <div class="image" [image-loader]="item.photoURL"></div>
-<!--              <img [src]="item.photoURL" width="50px" height="50px" style="border-radius: 50%;" alt="">-->
+              <!--              <img [src]="item.photoURL" width="50px" height="50px" style="border-radius: 50%;" alt="">-->
             </ion-col>
-            <ion-col size="10">
+            <ion-col [size]="getSize(item)">
+              <div (click)="goToPage(item)">
                 <label *ngIf="!isSeen(item)"><b>{{ item.body }}</b></label>
                 <label *ngIf="isSeen(item)">{{ item.body }}</label>
-                <br>
-                <label class="ion-no-margin ion-no-padding" style="font-size: small;color:gray;">{{ item.timestamp?.toDate() | amTimeAgo }}</label>
+                <br />
+              </div>
+              <label
+                class="ion-no-margin ion-no-padding"
+                style="font-size: small; color: gray;"
+                >{{ item.timestamp?.toDate() | amTimeAgo }}
+              </label>
+              <ion-icon
+              src="assets/icons/trash-outline.svg"
+                style="color: gray; position: relative; top: 4px; left: 5px;"
+                (click)="deleteNotification(item)"
+              ></ion-icon>
+            </ion-col>
+            <ion-col size="2" *ngIf="item.postPhoto">
+              <img
+                [src]="item.postPhoto"
+                style="border: 1px solid lightgray; border-radius: 5px;"
+              />
+            </ion-col>
+            <ion-col size="2" *ngIf="item.type==0 && item.photoURL">
+              <div
+                style="
+                  border: 1px solid lightgray;
+                  border-radius: 5px;
+                  width: 100%;
+                  height: 100%;
+                "
+                [image-loader]="item.photoURL"
+              ></div>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -50,40 +96,47 @@
 
       <ion-item-options side="end">
         <ion-item-option color="danger">
-          <ion-icon style="width:30px;height:30px;" name="trash" (click)="deleteNotification(item.id)"></ion-icon>
+          <ion-icon
+            style="width: 30px; height: 30px;"
+            name="trash"
+            (click)="deleteNotification(item.id)"
+          ></ion-icon>
         </ion-item-option>
       </ion-item-options>
-
     </ion-item-sliding>
   </ion-list>
 
-<app-spinner *ngIf="loading"></app-spinner>
+  <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event)">
+    <ion-infinite-scroll-content
+      loadingSpinner="bubbles"
+      loadingText="Loading more...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+  
+  <div *ngIf="notificationsFound.length === 0" class="not-found">
+    <p>No Notification Found</p>
+  </div>
 
+  <app-spinner *ngIf="loading"></app-spinner>
 </ion-content>
-
-
-
-
-
 <ion-toolbar>
-<ion-tabs>
-    <ion-tab-bar slot="bottom">
-
- <ion-tab-button routerLink="/feed" routerDirection="forward">
-           <ion-icon name="home" style="width: 30px; height: 50px;"></ion-icon>
+  <ion-tabs>
+    <ion-tab-bar color="favorite" slot="bottom">
+      <ion-tab-button routerLink="/feed" routerDirection="forward">
+        <ion-icon src="assets/icons/home-outline.svg" color="primary" style="width: 30px; height: 50px;"></ion-icon>
       </ion-tab-button>
 
-       <ion-tab-button routerLink="/profile" routerDirection="forward">
-           <ion-icon name="person" style="width: 28px; height: 50px;"></ion-icon>
+      <ion-tab-button routerLink="/profile" routerDirection="forward">
+        <ion-icon src="assets/icons/person-outline.svg" color="primary" style="width: 28px; height: 50px;"></ion-icon>
       </ion-tab-button>
 
-    <ion-tab-button routerLink="/people" routerDirection="forward">
-           <ion-icon name="ios-people" style="width: 35px; height: 50px;"></ion-icon>
+      <ion-tab-button routerLink="/people" routerDirection="forward">
+        <ion-icon
+        src="assets/icons/people-outline.svg"
+        color="primary"
+          style="width: 35px; height: 50px;"
+        ></ion-icon>
       </ion-tab-button>
-     
-    
-
-
     </ion-tab-bar>
   </ion-tabs>
- </ion-toolbar> 
+</ion-toolbar>

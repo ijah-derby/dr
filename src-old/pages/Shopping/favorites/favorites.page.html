@@ -1,0 +1,96 @@
+<ion-header>
+	<ion-toolbar>
+		<ion-buttons slot="start" class="ion-no-padding ion-no-margin">
+			<ion-back-button class="ion-no-padding ion-no-margin">
+				<!-- <ion-icon style="color: black;font-size: 26px;margin-left: 4px;" src="../../../assets/icons/chevron-back.svg" (click)="goBack()"></ion-icon> -->
+			</ion-back-button>
+			<ion-menu-button menu="shop">
+			</ion-menu-button>
+		  </ion-buttons>
+
+		<ion-buttons slot="end">
+			<ion-button fill="clear" class="shadow-0 txt1" [routerLink]="'/search'" routerDirection="forward">
+				<ion-icon name="search"></ion-icon>
+			</ion-button>
+			<ion-button fill="clear" class="shadow-0 txt1" [routerLink]="'/mycart'" routerDirection="forward">
+				<ion-icon name="cart"></ion-icon>
+			</ion-button>
+		</ion-buttons>
+
+		<ion-title>Favorites</ion-title>
+	</ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+
+	<div padding class="pdr-50">
+		<h2 class="uppercase pdr-50">the products you love</h2>
+	</div>
+
+	<div class="" *ngIf="list_favo_product == null || list_favo_product.length == 0 || !list_favo_product">
+		<h5 class="pdl-15 pdr-50 uppercase spacing-1 fs-14">You have not loved any product</h5>
+	</div>
+	<div class="" *ngIf="list_favo_product && list_favo_product.length > 0">
+		<div class="wrap-top-slide">
+			<ion-slides>
+				<ion-slide *ngFor="let item of list_favo_product_slide" [routerLink]="['/detail', {id_item: item.payload.doc.id}]">
+					<div text-left class="item-slide">
+						<div class="thumb flex-row flex-jus-center flex-ali-center">
+							<img src="{{item.payload.doc.data().thumb}}">
+						</div>
+					</div>
+				</ion-slide>
+			</ion-slides>
+		</div>
+
+		<br>
+		<br>
+
+		<h5 class="pdl-15 pdr-50 uppercase spacing-1 fs-14">loved in the nearest order</h5>
+		
+		<br>
+
+		<div class="list-prd-list" *ngIf="list_favo_product.length > 0">
+			<div class="item-prd mgb-20 pdb-15" *ngFor="let item of list_favo_product, let i = imdex">
+				<div class="thumb mgr-10" [routerLink]="['/detail', {id_item: item.payload.doc.id}]">
+					<img src="{{item.payload.doc.data().thumb}}">
+				</div>
+				<div class="">
+					<div class="ovfl-hidden" [routerLink]="['/detail', {id_item: item.payload.doc.id}]">
+						<h4 class="fs-16 fw-600 ellipsis mg-0">{{item.payload.doc.data().name}}</h4>
+						<p class="mg-0">
+							<span class="ellipsis fs-14 txt3 mg-0 line-through mgr-10 fw-600" *ngIf="currenciesProv && item.payload.doc.data().discount > 0">
+								<i *ngIf="currenciesProv">
+									{{currenciesProv.formatMoney(item.payload.doc.data().price)}}
+								</i>
+							</span>
+							<span class="ellipsis fs-14 txt1 mg-0 fw-600" *ngIf="currenciesProv && item.payload.doc.data().discount > 0">
+								{{currenciesProv.formatMoney(item.payload.doc.data().price - item.payload.doc.data().price*item.payload.doc.data().discount/100)}}
+							</span>
+							<span class="ellipsis fs-14 txt1 mg-0 fw-600" *ngIf="currenciesProv && item.payload.doc.data().discount == 0">
+								{{currenciesProv.formatMoney(item.payload.doc.data().price)}}
+							</span>
+						</p>
+					</div>
+					<div class="mgt-5">
+						<ion-button size="small" (click)="addCart(item)" class="fs-11 bdra-0 fw-600">
+							<ion-icon name="ios-cart"></ion-icon>
+							Add cart
+						</ion-button>
+						<ion-button size="small" color="primary" class="fs-11 bdra-0" *ngIf="favo_str.search(item.payload.doc.id) > -1" (click)="favorites(item)">
+							<ion-icon name="ios-heart"></ion-icon>
+						</ion-button>
+						<ion-button size="small" color="dark" class="fs-11 bdra-0" *ngIf="favo_str.search(item.payload.doc.id) < 0" (click)="favorites(item)">
+							<ion-icon name="ios-heart"></ion-icon>
+						</ion-button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<ion-infinite-scroll (ionInfinite)="loadMore($event)">
+		<ion-infinite-scroll-content></ion-infinite-scroll-content>
+	</ion-infinite-scroll>
+
+</ion-content>

@@ -93,8 +93,11 @@
 
 <ion-footer>
     <ion-toolbar>
-    <textarea [(ngModel)]="replyMsg"
-              elastic-textarea="5"
+    <textarea
+    autosize
+    maxrow="4"
+       useImportant="true"
+    [(ngModel)]="replyMsg"       
               (keyup)="keyUpMessage($event)"
               placeholder="{{ 'feed-reply-component.placeholder' | translate }}"
     ></textarea>

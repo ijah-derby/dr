@@ -1,0 +1,97 @@
+
+<ion-header>
+	<ion-toolbar>
+		<ion-buttons slot="start" class="ion-no-padding ion-no-margin">
+			<ion-back-button class="ion-no-padding ion-no-margin">
+				<!-- <ion-icon style="color: black;font-size: 26px;margin-left: 4px;" src="../../../assets/icons/chevron-back.svg"></ion-icon> -->
+			</ion-back-button>
+			<ion-menu-button menu="shop">
+			</ion-menu-button>
+		  </ion-buttons>
+
+		<ion-buttons slot="end">
+			<ion-button fill="clear" class="shadow-0 txt1" [routerLink]="'/search'" routerDirection="forward">
+				<ion-icon name="search"></ion-icon>
+			</ion-button>
+		</ion-buttons>
+
+		<ion-title>Mycart</ion-title>
+	</ion-toolbar>
+</ion-header>
+
+<ion-content class="pdl-15 pdr-15">
+	<br>
+	<div padding class="" *ngIf="!list_cart || list_cart.length == 0 || list_cart == null">
+		<h3 class="txt1">You have not selected any products for yourself</h3>
+	</div>
+	<div class="" *ngIf="list_cart && list_cart.length > 0 && list_cart != null">
+		<div class="">
+			<div class="item-cart pdb-15 pdt-15" *ngFor="let item of list_cart, let i = index">
+				<div class="">
+					<ion-button class="shadow-0 txt3" fill="clear" (click)="removeItem(i)">
+						<ion-icon name="ios-close-circle"></ion-icon>
+					</ion-button>
+				</div>
+				<div class="thumb ovfl-hidden flex-row flex-ali-center flex-jus-center" [routerLink]="['/detail', {id_item: item.id}]">
+					<img [src]="item.thumb2">
+				</div>
+				<div class="description pdl-10 pdr-15 ovfl-hidden" [routerLink]="['/detail', {id_item: item.id}]">
+					<h4 class="fs-16 mg-0 ellipsis">{{item.name}}</h4>
+					<p class="mg-0 txt3 fw-600 ellipsis" *ngIf="currenciesProv">
+						<span class="ellipsis fs-14 txt3 mg-0 line-through mgr-10 fw-600" *ngIf="item.discount > 0">
+							<i>{{item.price}}</i>
+						</span>
+						<span class="ellipsis fs-14 txt1 mg-0 fw-600" *ngIf="item.discount > 0">
+							{{item.price - item.price*item.discount/100}}
+						</span>
+						<span class="ellipsis fs-14 txt1 mg-0 fw-600" *ngIf="item.discount == 0">
+							{{item.price}}
+						</span>
+					</p>
+				</div>
+				<div class="quantity">
+					<ion-button fill="clear" size="small" class="txt3 shadow-0 fs-18 mg-0" (click)="quantity(i, 1)">
+						<ion-icon name="ios-add"></ion-icon>
+					</ion-button>
+					<ion-input type="number" text-center value="{{item.quantity}}" (ionChange)="enterQuantity(i, $event.target.value)" min="1" max="99" minlength="1" maxlength="2"></ion-input>
+					<ion-button fill="clear" size="small" class="txt3 shadow-0 fs-18 mg-0" (click)="quantity(i, -1)">
+						<ion-icon name="ios-remove"></ion-icon>
+					</ion-button>
+				</div>
+			</div>
+		</div>
+
+		<div class="white mgt-15">
+			<div class="transaction-fee flex-row flex-ali-center pdl-20 pdr-20 pdb-5">
+				<p class="txt3">Total Price</p>
+				<p class="fw-600 flex-1" text-right *ngIf="total_price">+ {{total_price}}</p>
+			</div>
+			<hr class="bg-light">
+			<div class="transaction-fee flex-row flex-ali-center pdl-20 pdr-20 pdb-5">
+				<p class="txt3">Tax({{tax}}%)</p>
+				<p class="fw-600 flex-1" text-right *ngIf="tax_pay">+ {{tax_pay}}</p>
+			</div>
+			<hr class="bg-light">
+			<div class="transaction-fee flex-row flex-ali-center pdl-20 pdr-20 pdb-5">
+				<p class="txt3">Transaction Fee({{shipfee}}/km)</p>
+				<p class="fw-600 flex-1" text-right *ngIf="shipfee_pay">+ {{shipfee_pay}}</p>
+			</div>
+			<hr class="bg-light">
+			<div class="total-pay mgt-30" text-center>
+				<p class="txt4 mgb-5">Total your pay</p>
+				<h2 class="fw-900 spacing-3 fs-40 mgt-0" *ngIf="total_pay">{{total_pay}}</h2>
+			</div>
+			<br class="bg-light">
+			<div class="" text-center>
+				<ion-button size="large" shape="round" color="primary" class="bdra-30 uppercase fw-600 bg-base" [routerLink]="['/checkout', {total_price: total_price, tax_pay: tax_pay, shipfee_pay: shipfee_pay, total_pay: total_pay}]" routerDirection="forward">
+					Pay & Order
+					<ion-icon slot="end" name="md-play"></ion-icon>
+				</ion-button>
+			</div>
+			<br>
+			<br>
+			<br>
+			<br>
+		</div>
+	</div>
+</ion-content>

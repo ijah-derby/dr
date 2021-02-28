@@ -50,6 +50,7 @@ margin-right: 15px;
 
 
 
+
 ion-badge {
   position: absolute;
   right: 0;
@@ -58,12 +59,6 @@ ion-badge {
 }
 
 
-.writer {
-    position: fixed;
-    Top: 55px;
-    right: -8px;
-    z-index: 999; 
-}
 
 .down{
  display: block;
@@ -78,9 +73,43 @@ ion-badge {
   }
 }
 
-.cart-icon {
+.cart {
   color: black;
-  font-size: 20px;
-  margin-left: 15px;
+  font-size: 23px;
+  margin-left: 8px;
+  margin-top: 1px;
 }
 
+.headphones {
+  color: black;
+  font-size: 23px;
+ 
+  margin-right: 8px;
+}
+
+.knowledge {
+  color: black;
+  font-size: 23px;
+  margin-top: 1px;
+  margin-left: 4px;
+}
+
+.tool {
+  box-shadow: 0px 0.2px 0px #a8a8a8!important;
+}
+
+ion-icon {
+  &.big {
+    width: 50px;
+    height: 50px;
+  }
+
+  &.bigger {
+    width: 100px;
+    height: 100px;
+  }
+
+  &.red {
+    color: red;
+  }
+}

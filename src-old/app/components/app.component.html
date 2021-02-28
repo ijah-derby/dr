@@ -1,0 +1,120 @@
+<ion-app>
+  <ion-split-pane contentId="main-content">
+    <ion-menu class="small" menuId="first" type="overlay" contentId="main-content">
+      <ion-header>
+        <ion-toolbar color="danger">
+          <ion-title>{{ 'app-component.menu' | translate }}</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="custom">
+        <ion-list
+                class="menu"
+                [colorLuminance]="{
+            color: color,
+            percent: pages.indexOf(pages[pages.length - 1]) * 3,
+            rgbHex: true
+          }"
+        >
+          <ion-menu-toggle auto-hide="false">
+            <div
+                    class="item"
+                    menuClose
+                    *ngFor="let page of pages; let i = index"
+                    (click)="open(page)"
+                    [ngStyle]="{ height: 100 / pages.length + '%' }"
+                    [colorLuminance]="{ color: color, percent: i * 3, rgbHex: true }"
+            >
+              <ion-icon *ngIf="!page.image" src="../assets/icons/{{ page.icon }}.svg"></ion-icon>
+              <div class="image" *ngIf="page.image" [image-loader]="page.icon"></div>
+            </div>
+          </ion-menu-toggle>
+        </ion-list>
+      </ion-content>
+    </ion-menu>
+    <ion-menu class="full" menuId="second" contentId="main-content" side="end" type="overlay">
+      <ion-header>
+        <ion-toolbar color="favorite">
+          <ion-menu-button class="ion-float-left" menu="second" autoHide="true">
+            <ion-icon color="medium" name="ios-arrow-back"></ion-icon>
+          </ion-menu-button>
+
+          <img alt="appicon" height="22" class="ion-float-right" src="assets/images/logo1.png"/>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content style="background-color: #000000">
+        <ion-menu-toggle menu="second">
+        </ion-menu-toggle>
+
+
+
+        <div style="display:block;position:absolute;bottom:-8px;width:100%;">
+          <iframe src="https://dontramp.com/hq/main1" frameborder="0" allowtransparency="yes" scrolling="no" style="width:100%;  height: 92.5vh; position:relative; left:0px;margin:0;padding:0; z-index:999;" ></iframe>
+        </div>
+
+      </ion-content>
+    </ion-menu>
+    <ion-menu menuId="shop" type="overlay" contentId="main-content">
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>
+            <img class="logo-in-menu" src="assets/images/logo1.png">
+          </ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+
+        <br>
+        <br>
+
+        <div class="profile-menu-wrap" text-center *ngIf="user || user != null">
+          <div class="wrap-top">
+            <h2 class="spacing-1 mgb-15 fs-20 capitalize txt1 fw-600">{{user.displayName}}</h2>
+            <div class="avt-thumb">
+              <img src="{{(user.avt != '' && user.avt != null)? user.avt : 'assets/imgs/no-avt.png' }}">
+            </div>
+            <div text-center class="act">
+              <ion-menu-toggle auto-hide="false" menu="shop">
+                <ion-button size="small" shpae="round" color="dark" class="btn-logout ovfl-hidden bdra-30 fs-12 mgl-10 mgb--10 shadow-2" (click)="logout()">
+                  <ion-icon name="md-log-out"></ion-icon>
+                </ion-button>
+              </ion-menu-toggle>
+            </div>
+          </div>
+          <div class="info">
+            <p class="mgt-20 txt-b2 fw-500 spaing-1 mgb-0 txt2">{{user.email}}</p>
+            <p class="fs-12 txt-b4 spacing-1 mgt-5 txt3">
+              <ion-icon name="pin"></ion-icon>
+              {{(user.address && user.address != null && user.address != '')? user.address : 'Need to add address'}}
+            </p>
+
+            <br>
+          
+          </div>
+        </div>
+
+
+        <div class="main-menu bg-l1 pdl-20">
+          
+          <br>
+          
+          <ion-list class="lst-no-background" no-margin no-lines>
+            <ion-menu-toggle auto-hide="false" *ngFor="let p of menu" menu="shop">
+              <ion-item [routerDirection]="'forward'" [routerLink]="[p.path]" class="txt1">
+                <ion-icon slot="start" [name]="p.icon"></ion-icon>
+                <ion-label>{{p.name}}</ion-label>
+              </ion-item>
+            </ion-menu-toggle>
+          </ion-list>
+
+          <br>
+          <br>
+        
+        </div>
+
+
+      </ion-content>
+    </ion-menu>
+    <ion-router-outlet id="main-content"></ion-router-outlet>
+  </ion-split-pane>
+</ion-app>
+
