@@ -24,7 +24,7 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     SharedModule
   ],
-  declarations: [GroupPage, UploadProgressComponent],
-  entryComponents: [UploadProgressComponent]
+  declarations: [GroupPage],
+  entryComponents: []
 })
 export class GroupPageModule {}

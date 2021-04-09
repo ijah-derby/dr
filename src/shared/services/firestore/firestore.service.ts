@@ -23,7 +23,6 @@ import {
 import { Upload } from "../../helpers/upload";
 import { AlertController } from "@ionic/angular";
 import { AuthService } from "src/pages/auth/services/auth/auth.service";
-import { ToastService } from "src/app/services/toast.service";
 
 type CollectionPredicate<T> = string | AngularFirestoreCollection<T>;
 type DocPredicate<T> = string | AngularFirestoreDocument<T>;
@@ -47,8 +46,7 @@ export class FirestoreService {
   constructor(
     private afs: AngularFirestore,
     private afStorage: AngularFireStorage,
-    private alertCtrl: AlertController,
-    private toast: ToastService
+    private alertCtrl: AlertController
   ) {}
 
   /// **************
@@ -93,6 +91,20 @@ export class FirestoreService {
       );
   }
 
+  public docOnce$<T>(path: string) {
+    return this.afs.doc(path).get().pipe(
+      map((actions) => {
+        return { ...actions.data() as any};
+        // return actions.map(a => {
+        //   const data: any = a.data() as T;
+        //   const id = a.id;
+        //   const doc = a;
+        //   return {doc, id, ...data };
+        // })
+      })
+    );
+  }
+
   public col$<T>(ref: CollectionPredicate<T>, queryFn?): Observable<T[]> {
     return this.col({ ref, queryFn })
       .snapshotChanges()
@@ -103,6 +115,19 @@ export class FirestoreService {
           ) as T[];
         })
       );
+  }
+
+  public colOnce$<T>(path: string, queryFn?) {
+    return this.afs.collection(path, queryFn).get().pipe(
+      map((actions) => {
+        return actions.docs.map(a => {
+          const data: any = a.data() as T;
+          const id = a.id;
+          const doc = a;
+          return {doc, id, ...data };
+        })
+      })
+    );
   }
 
   /// with Ids
@@ -420,11 +445,6 @@ export class FirestoreService {
         this.progressMsg = Math.trunc(progress) + "% uploaded...";
         this.progressVal.next(Math.trunc(progress));
         console.log(this.progressMsg);
-        this.progressVal.subscribe(resp => {
-          if(resp > 0) {
-            this.toast.show(resp + "% file uploaded", 10);
-          }
-        })
         switch (snapshot.state) {
           case firebase.storage.TaskState.PAUSED: // or 'paused'
             console.log("Upload is paused");

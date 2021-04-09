@@ -110,7 +110,9 @@ export class MessagesService extends Extender {
     if(user.uid) {
       this.navCtrl.navigateForward('message', {
         queryParams: {
-          id: user.uid
+          id: user.uid,
+          name: user.displayName,
+          img: user.photoURL
         }
       });
     }

@@ -20,6 +20,7 @@ import { AppComponent } from './components/app.component';
 import { FriendPipe } from './pipes/friend.pipe';
 import { PipesPipe } from './pipes.pipe';
 import { GroupPipe } from './pipes/group.pipe';
+import { UploadProgressComponent } from './component/upload-progress/upload-progress.component';
 
 /**
  * bootstrap app component and add all the modules required in this app
@@ -33,8 +34,8 @@ import { GroupPipe } from './pipes/group.pipe';
  * configure hammer gesture for more touch effects like long press, pinch, span etc
  */
 @NgModule({
-  declarations: [AppComponent],
-  entryComponents: [],
+  declarations: [AppComponent, UploadProgressComponent],
+  entryComponents: [UploadProgressComponent],
   imports: [
     BrowserModule,
     HttpClientModule,

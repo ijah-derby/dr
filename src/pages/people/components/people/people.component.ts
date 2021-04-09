@@ -229,7 +229,7 @@ export class PeopleComponent extends Extender implements OnInit {
       });
     } else {
       this.isSearched = false;
-      people = [...this.list];
+      people = this.list;
     }
     console.log(this.fullList);
     console.log(people);

@@ -5,9 +5,9 @@
     </ion-buttons>
     <ion-title *ngIf="group">{{group.name}}</ion-title>
     <ion-buttons slot="end">
-      <ion-button color="danger" (click)="leaveGroup()" *ngIf="groupMembers && groupMembers.length > 1">Leave
+      <ion-button color="danger" (click)="leaveGroup()" *ngIf="user && user.uid && group.admin != user.uid && groupMembers && groupMembers.length > 1">Leave
       </ion-button>
-      <ion-button color="danger" (click)="deleteGroup()" *ngIf="groupMembers && groupMembers.length <= 1">Delete
+      <ion-button color="danger" (click)="deleteGroup()" *ngIf="user && user.uid && group.admin === user.uid">Delete
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -47,9 +47,10 @@
             <h2>{{member.displayName}}</h2>
           </ion-text>
           <ion-text>
-            <!-- <p>{{member.description}}</p> -->
+            <p *ngIf="member.uid === group.admin">Group Admin</p>
           </ion-text>
         </ion-label>
+        <ion-button *ngIf="user.uid && group.admin === user.uid && member.uid != user.uid" slot="end" (click)="askRemove(member)" fill="outline">Remove</ion-button>
       </ion-item>
     </ion-list>
   </div>

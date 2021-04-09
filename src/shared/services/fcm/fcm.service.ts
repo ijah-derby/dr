@@ -57,9 +57,14 @@ export class FcmService extends Extender {
     if ((window as any).cordova) {
       return this.firebaseNative.onMessageReceived();
     } else {
+      console.log('notification listening');
+      this.afMessaging.messages.subscribe(msg => {
+        console.log('notification listening', msg);
+      })
       return this.afMessaging.messages.pipe(
         tap((msg) => {
           const body: any = (msg as any).notification.body;
+          console.log('notification body', body);
           this.toast(body);
         })
       );

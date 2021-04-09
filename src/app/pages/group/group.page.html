@@ -1,13 +1,30 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar class="tool">
     <ion-buttons slot="start">
-      <ion-back-button mode="md" defaultHref="messages"></ion-back-button>
+      <ion-back-button mode="md" defaultHref="messages">
+        <ion-icon  style="color: #351010; font-size: 26px; margin-left: 0px;"
+      icon="../../../../assets/icons/chevron-back.svg" ></ion-icon>
+      </ion-back-button>
     </ion-buttons>
-    <ion-title>{{title}}</ion-title>
+    <ion-item lines="none" style="--background: transparent;--padding-start: 0px;">
+      <ion-avatar slot="start">
+        <img [src]="avatar" onError="this.src='./assets/images/default-group.png'" alt="">
+      </ion-avatar>
+      <ion-label>
+        <h5 class="usertitle">{{title}}</h5>
+      </ion-label>
+    </ion-item>
     <ion-buttons slot="end">
       <ion-button fill="clear" (click)="groupInfo()">
-        <ion-icon name="information-circle-outline"></ion-icon>
+        <ion-icon name="md-list"></ion-icon> 
       </ion-button>
+      <img
+      id="hide"
+      alt="appicon"
+      height="22"
+      class="ion-float-right"
+      src="assets/images/logo1.png"
+    />
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -19,52 +36,151 @@
         messages</span></p>
     <div *ngFor="let message of messagesToShow; let i = index;">
       <!--  System Message -->
-      <div *ngIf="isSystemMessage(message)" class="chatbox right system">
-        <p>
+      <div *ngIf="isSystemMessage(message)" class="chatbox right system" style="background: transparent !important;">
+        <p class="system-message">
           <ion-icon name="{{message.icon}}"></ion-icon>
           {{message.message}} {{message.date | DateFormat}}
         </p>
       </div>
+
+
+      <ion-item-sliding *ngIf="isSender(message) && !isSystemMessage(message)" id="slidingItem{{message.id}}" (ionDrag)="drag($event, message)">
+        <ion-item-options side="start">
+          <ion-item-option style="display: none;">Reply</ion-item-option>
+        </ion-item-options>
+
+        <div *ngIf="isSender(message) && !isSystemMessage(message)" class="right">
+
+          <ion-item *ngIf="isSender(message) && !isSystemMessage(message)" lines="none" style="--padding-start: 12px;">
+            <ion-list>
+              <ion-row>
+                <ion-col size="12">
+                  <div class="msg-header" *ngIf="message.sender != currentUser.uid">
+                    <img *ngIf="!message.avatar" src="../../../assets/images/default-group.png" alt="">
+                    <img (click)="viewUser(message.sender)" *ngIf="message.avatar" [src]="message.avatar" alt="">
+                    <h6 class="msg-name" (click)="viewUser(message.sender)">{{message.displayName ?  message.displayName : 'User Deleted'}}</h6>
+                  </div>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col size="12">
+                  <div class="reply-view-header" *ngIf="message.replyToMessage" (click)="scrollTo('slidingItem' + getRepliedMessage(message.replyTo).id)">
+                    <h5>{{getRepliedMessage(message.replyTo).displayName}}</h5>
+                    <p *ngIf="message.replyToMessageType === 'text'" [innerHTML]="getMessage(message.replyToMessage)"></p>
+                    <p *ngIf="message.replyToMessageType === 'location'">Location Shared</p>
+                    <img *ngIf="message.replyToMessageType === 'image'" [src]="message.replyToMessage" alt="">
+                    <video id="video-post" *ngIf="message.replyToMessageType === 'video'">
+                      <source src="{{message.replyToMessage}}" type="video/mp4">
+                    </video>
+                  </div>
+                  <div *ngIf="message.type == 'text'">
+                    <p  style="margin:0; float: left; text-align: left; padding-left: 5px; padding-right: 5px; padding-bottom: 5px;" [innerHTML]="getMessage(message.message)"></p>
+                  </div>
+                  <div *ngIf="message.type == 'location'" (click)="openMsgOption(messag.id, i)" [innerHtml]="message.message"></div>
+                  <div *ngIf="message.type == 'image'">
+                    <img tappable (click)="enlargeImage(message.url)" src="{{message.url}}" 
+                      onError="this.src='./assets/images/default-dp.png'"/>
+                  </div>
+                  <div (click)="openMsgOption(message.id, i)"></div>
+                  <div *ngIf="message.type == 'video'">
+                    <video auto controls width="100%">
+                      <source src="{{message.url}}" type="video/mp4">
+                    </video>
+                  </div>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col size="12" class="ion-no-padding ion-no-margin">
+                  <div class="msg-footer">
+                    <span style="font-size: 11px;">{{message.date | DateFormat}}</span>
+                    <ion-icon style="margin-top: 5px; margin-left: 5px; float: left; text-align: left;" name="md-more" (click)="openMsgOption(message.id, i)"></ion-icon>
+                  </div>
+                </ion-col>
+              </ion-row>
+            </ion-list>
+          </ion-item>
+        </div>
+      </ion-item-sliding>
+
       <!--  Message -->
-      <div *ngIf="isSender(message) && !isSystemMessage(message)" class="chatbox right">
 
-        <div *ngIf="isSender(message) && !isSystemMessage(message)">
-          <div class="msg-header" (click)="viewUser(message.sender)">
-            <img *ngIf="!message.avatar" src="../../../assets/images/default-group.png" alt="">
-            <img *ngIf="message.avatar" [src]="message.avatar" alt="">
-            <h6 class="msg-name">{{message.displayName ?  message.displayName : 'User Deleted'}}</h6>
-          </div>
-          <div *ngIf="message.type == 'text'" (click)="openMsgOption(message.id, i)">
-            <p [innerHTML]="getMessage(message.message)"></p>
-            <span>{{message.date | DateFormat}}</span>
-          </div>
-          <div *ngIf="message.type == 'location'" (click)="openMsgOption(messag.id, i)" [innerHtml]="message.message"></div>
-          <div *ngIf="message.type == 'image'" (click)="openMsgOption(message.id, i)">
-            <img tappable (click)="enlargeImage(message.url)" src="{{message.url}}" (load)="scrollBottom()"
-              onError="this.src='./assets/images/default-dp.png'" />
-            <span>{{message.date | DateFormat}}</span>
-          </div>
-          <div *ngIf="message.type == 'video'" (click)="openMsgOption(message, i)">
-            <video controls width="100%" (click)="openMsgOption(message.id, i)">
-              <source src="{{message.url}}" type="video/mp4">
-            </video>
-          </div>
-        </div>
-      </div>
+      <ion-item-sliding *ngIf="!isSender(message) && !isSystemMessage(message)" id="slidingItem{{message.id}}" (ionDrag)="drag($event, message)">
+        <ion-item-options side="start">
+          <ion-item-option style="display: none;">Reply</ion-item-option>
+        </ion-item-options>
 
-      <div *ngIf="!isSender(message) && !isSystemMessage(message)" class="chatbox left">
-        <div class="msg-header" (click)="viewUser(message.sender)">
-          <img *ngIf="!message.avatar" src="../../../assets/images/default-group.png" alt="" tappable (load)="scrollBottom()">
-          <img *ngIf="message.avatar" [src]="message.avatar" alt="" tappable (load)="scrollBottom()">
-          <h6 class="msg-name">{{message.displayName ?  message.displayName : 'User Deleted'}}</h6>
+        <div *ngIf="!isSender(message) && !isSystemMessage(message)" class="chatbox left">
+
+          <ion-item *ngIf="!isSender(message) && !isSystemMessage(message)" class="rec-item" lines="none">
+            <ion-list>
+              <ion-row>
+                <ion-col size="12">
+                  <div class="msg-header" *ngIf="message.sender != currentUser.uid">
+                    <img *ngIf="!message.avatar" src="../../../assets/images/default-group.png" alt="">
+                    <img (click)="viewUser(message.sender)" *ngIf="message.avatar" [src]="message.avatar" alt="">
+                    <h6 class="msg-name" (click)="viewUser(message.sender)">{{message.displayName ?  message.displayName : 'User Deleted'}}</h6>
+                  </div>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col size="12">
+                  <div class="reply-view-header" *ngIf="message.replyToMessage" (click)="scrollTo('slidingItem' + getRepliedMessage(message.replyTo).id)">
+                    <h5>{{getRepliedMessage(message.replyTo).displayName}}</h5>
+                    <p *ngIf="message.replyToMessageType === 'text'" [innerHTML]="getMessage(message.replyToMessage)"></p>
+                    <p *ngIf="message.replyToMessageType === 'location'">Location Shared</p>
+                    <img *ngIf="message.replyToMessageType === 'image'" [src]="message.replyToMessage" alt="">
+                    <video id="video-post" *ngIf="message.replyToMessageType === 'video'">
+                      <source src="{{message.replyToMessage}}" type="video/mp4">
+                    </video>
+                  </div>
+                  <div *ngIf="message.type == 'text'">
+                    <p  style="margin:0; float: left; text-align: left; padding-left: 5px; padding-right: 5px; padding-bottom: 5px;" [innerHTML]="getMessage(message.message)"></p>
+                  </div>
+                  <div *ngIf="message.type == 'location'" (click)="openMsgOption(messag.id, i)" [innerHtml]="message.message"></div>
+                  <div *ngIf="message.type == 'image'">
+                    <img tappable (click)="enlargeImage(message.url)" src="{{message.url}}" 
+                      onError="this.src='./assets/images/default-dp.png'"/>
+                  </div>
+                  <div (click)="openMsgOption(message.id, i)"></div>
+                  <div *ngIf="message.type == 'video'">
+                    <video auto controls width="100%">
+                      <source src="{{message.url}}" type="video/mp4">
+                    </video>
+                  </div>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col size="12" class="ion-no-padding ion-no-margin">
+                  <div class="msg-footer">
+                    <span>{{message.date | DateFormat}}</span>
+                    <!-- <ion-icon style="margin-top: 5px; margin-left: 5px; float: left; text-align: left;" name="md-more" (click)="openMsgOption(message.id, i)"></ion-icon> -->
+                  </div>
+                </ion-col>
+              </ion-row>
+            </ion-list>
+          </ion-item>
         </div>
-        <!-- <img src="{{message.avatar}}" tappable (click)="viewUser(message.sender)" (load)="scrollBottom()"
-          onError="this.src='./assets/images/default-dp.png'" style="height:30px; border-radius: 100%;float:left;" /> -->
+      </ion-item-sliding>
+      
+
+      <!-- <div *ngIf="!isSender(message) && !isSystemMessage(message)" class="chatbox left" style="padding: 10px 10px 5px 10px; border-radius: 10px; border: 0.5px solid rgb(185, 185, 185); box-shadow: 1px 1px 4px var(--ion-color-light-shade);">
+        <div class="msg-header">
+          <img *ngIf="!message.avatar" src="../../../assets/images/default-group.png" (click)="viewUser(message.sender)" alt="" tappable (load)="scrollBottom()">
+          <div>  <img (click)="viewUser(message.sender)" *ngIf="message.avatar" [src]="message.avatar" alt="" tappable (load)="scrollBottom()"></div>
+          <h6 class="msg-name" (click)="viewUser(message.sender)">{{message.displayName ?  message.displayName : 'User Deleted'}}</h6>
+        </div>
         <div *ngIf="message.type == 'text'">
           <p [innerHTML]="getMessage(message.message)"></p>
+          <div class="msg-footer">
+            <br>
           <span>{{message.date | DateFormat}}</span>
         </div>
-        <div *ngIf="message.type == 'location'" [innerHtml]="message.message"></div>
+      </div>
+      
+  
+  
+
+        <div class="bottom" *ngIf="message.type == 'location'" [innerHtml]="message.message"></div>
         <div *ngIf="message.type == 'image'">
           <img tappable (click)="enlargeImage(message.url)" src="{{message.url}}"
             onError="this.src='./assets/images/default-dp.png'" (load)="scrollBottom()" />
@@ -75,28 +191,60 @@
             <source src="{{message.url}}" type="video/mp4">
           </video>
         </div>
-      </div>
+      </div> -->
 
     </div>
   </div>
+
+  <ion-fab vertical="bottom" horizontal="start" slot="fixed">
+    <ion-fab-button class="colr" color="light"  (click)="loadPreviousMessages()">
+      <ion-icon class="colr"  name="ios-arrow-down"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+  
 </ion-content>
 <!-- Message Box -->
-<ion-footer>
-  <ion-toolbar>
-    <ion-item lines="none">
-      <ion-button slot="start" fill="clear" (click)="attach()">
-        <ion-icon name="attach"></ion-icon>
-      </ion-button>
-      <ion-textarea autoGrow="true" style="height:100%" (ionFocus)="scrollBottom()" rows="1◊"
-        placeholder="Type your message" [(ngModel)]="message">
-      </ion-textarea>
-      <ion-button slot="end" color="primary" fill="clear" (click)="send('text')" [disabled]="!message">
-        <ion-icon name="send"></ion-icon>
-      </ion-button>
-    </ion-item>
-  </ion-toolbar>
-</ion-footer>
 
+
+
+<ion-footer>
+  <ion-toolbar style="--background: #eeeeee7d;padding-top: 5px;">
+    
+    <ion-item lines="none" style="--background: #f7f7f7;" *ngIf="replyMessage.message">
+      <ion-label class="reply">
+        <h6>{{replyMessage.displayName}}</h6>
+        <p *ngIf="replyMessage.type === 'text'">{{replyMessage.message}}</p>
+        <p *ngIf="replyMessage.type === 'location'">Location Shared</p>
+        <img *ngIf="replyMessage.type === 'image'" [src]="replyMessage.message" class="reply-img">
+        <video id="video-post" *ngIf="replyMessage.type === 'video'" class="reply-img">
+          <source src="{{replyMessage.message}}" type="video/mp4">
+        </video>
+      </ion-label>
+      <ion-icon name="close" slot="end" (click)="replyMessage.message = null;replyMessage.id = null;"></ion-icon>
+    </ion-item>
+
+    <ion-button slot="start" fill="clear" (click)="attach()">
+      <ion-icon src="../../../assets/icons/attach.svg"></ion-icon>
+    </ion-button>
+
+    <textarea class="grow"
+    autosize
+    maxrow="4"
+    useImportant="true"
+    [(ngModel)]="message"
+    #myInput
+    placeholder="{{ 'feed-comment-component.placeholder' | translate }}"
+    ></textarea>
+    
+        <ion-buttons slot="end">
+            <ion-button class="circle" fill="clear" color="primary" (click)="send('text')" [disabled]="!message">
+                <ion-icon src="assets/icons/send.svg"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+
+
+</ion-footer>
 <input
   hidden
   #fileInputButton

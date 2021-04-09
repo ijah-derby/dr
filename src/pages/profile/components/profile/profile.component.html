@@ -43,9 +43,6 @@
           <div class="status-msg">
             {{ (user.statusMessage | slice: 0:120) || "I am a Dont Rampian" }}
           </div>
-          <div class="status-url">
-            {{ companyURL }}
-          </div>
           <div class="country" *ngIf="user.country">{{ user.country }}</div>
           <ion-button 
             *ngIf="!loading && !isFriend() && otherUser"

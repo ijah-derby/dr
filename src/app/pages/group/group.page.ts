@@ -26,6 +26,7 @@ export class GroupPage implements OnInit {
   @ViewChild(IonContent, null) contentArea: IonContent;
 
   title: any;
+  avatar: any;
   groupId: any;
   message: any;
   messages: any;
@@ -36,10 +37,20 @@ export class GroupPage implements OnInit {
   // Set number of messages to show.
   numberOfMessages = 10;
   currentUser: IUser;
+  replyMessage = {
+    id: null,
+    message: null,
+    displayName: null,
+    type: null
+  };
 
   @ViewChild("fileInputButton", null) private fileInputButton: ElementRef;
   @ViewChild("videoInputButton", null) private videoInputButton: ElementRef;
   @ViewChild('videoPlayer', null) videoPlayer: ElementRef;
+  @ViewChild('myInput', null) myInput ;
+  @ViewChild(IonContent, null) content: IonContent;
+
+  isSingleMessage = 0;
   // GroupPage
   // This is the page where the user can chat with other group members and view group info.
   constructor(
@@ -70,62 +81,36 @@ export class GroupPage implements OnInit {
     }, 5000);
   }
 
-  ionViewDidEnter() {
+  async ionViewDidEnter() {
     // Get group details
+
+    this.currentUser = await this.authService.getUser();
 
     this.subscription = this.dataProvider.getGroup(this.groupId).subscribe((group: any) => {
       if (group) {
         this.title = group.name;
+        this.avatar = group.img;
         // Get group messages
-        this.dataProvider.getGroupMessages(group.id).subscribe((messagesRes: any) => {
-          let messages = messagesRes;
-          if (messages == null || messages == undefined) messages = [];
-
-          if (this.messages != null && this.messages != undefined) {
-            // Just append newly added messages to the bottom of the view.
-
-            if (messages.length > this.messages.length) {
-              let message = messages[messages.length - 1];
-              this.dataProvider.getUser(message.sender).subscribe((user: any) => {
-                message.avatar = user.photoURL;
-                message.displayName = user.displayName;
-              });
-              this.messages.push(message);
-              // Also append to messagesToShow.
-              this.messagesToShow.push(message);
-              console.log('msgs', this.messagesToShow);
-            }
-          } else {
-            // Get all messages, this will be used as reference object for messagesToShow.
-            this.messages = [];
-            messages.forEach((message) => {
-              this.dataProvider.getUser(message.sender).subscribe((user: any) => {
-                if (user.id != null) {
-                  message.avatar = user.photoURL;
-                  message.displayName = user.displayName;
-                }
-              });
-              this.messages.push(message);
-            });
-            // Load messages in relation to numOfMessages.
-            if (this.startIndex == -1) {
-              // Get initial index for numberOfMessages to show.
-              if ((this.messages.length - this.numberOfMessages) > 0) {
-                this.startIndex = this.messages.length - this.numberOfMessages;
-              } else {
-                this.startIndex = 0;
+        this.firestore.docOnce$(`users/${this.currentUser.uid}/groups/${group.id}`).subscribe((resp: any) => {
+          
+          this.firestore.col$('groups/' + group.id + '/messages', ref => ref.orderBy('createdAt', 'desc').limit(1)).subscribe((resp: any[]) => {
+            if(this.isSingleMessage >= 1) {
+              console.log('recent message',resp);
+              const index = this.messages.findIndex(item => item.id === resp[0].id);
+              console.log('index', index);
+              if(index === -1) {
+                // this.messages.push(resp[0]);
+                this.displayMessages(resp);
               }
             }
-            if (!this.messagesToShow) {
-              this.messagesToShow = [];
-            }
-            // Set messagesToShow
-            for (var i = this.startIndex; i < this.messages.length; i++) {
-              this.messagesToShow.push(this.messages[i]);
-            }
-            this.loadingProvider.dismissLoader();
-          }
-        });
+          });
+          
+          this.dataProvider.getGroupMessages(group.id, resp.createdAt).subscribe((messagesRes: any) => {
+            let messages = messagesRes;
+            this.displayMessages(messages);
+            if(this.isSingleMessage === 0) this.isSingleMessage = 1;
+          });
+        })
       }
     });
 
@@ -140,7 +125,81 @@ export class GroupPage implements OnInit {
         }
       }, 60000);
     }
-    setTimeout(() => this.scrollBottom(), 1000);
+    
+    setTimeout(() => {
+      setTimeout(() => {
+        if (this.contentArea.scrollToBottom) {
+          this.contentArea.scrollToBottom();
+        }
+      }, 500);
+    }, 1000);
+  }
+
+  displayMessages(messages: any[]) {
+  
+    if (this.messages != null && this.messages != undefined) {
+
+      let message = messages[messages.length - 1];
+        this.dataProvider.getUser(message.sender).subscribe((user: any) => {
+          message.avatar = user.photoURL;
+          message.displayName = user.displayName;
+        });
+        if(message.replyTo) {
+          const index = this.messages.findIndex(item => item.id === message.replyTo);
+          message.replyToMessageType = this.messages[index] ? this.messages[index].type : 'text';
+          if(message.replyToMessageType === 'text') {
+            message.replyToMessage = this.messages[index] ? this.messages[index].message : '<i>Message not found</i>';
+          } else if(message.replyToMessageType === 'image' || message.replyToMessageType === 'video') {
+            message.replyToMessage = this.messages[index] ? this.messages[index].url : '<i>Message not found</i>';
+          }
+        }
+        this.messages.push(message);
+        // Also append to messagesToShow.
+        this.messagesToShow.push(message);
+        setTimeout(() => {
+          if (this.contentArea.scrollToBottom) {
+            this.contentArea.scrollToBottom();
+          }
+        }, 500);
+    } else {
+      // Get all messages, this will be used as reference object for messagesToShow.
+      this.messages = [];
+      messages.forEach((message) => {
+        this.dataProvider.getUser(message.sender).subscribe((user: any) => {
+          if (user.id != null) {
+            message.avatar = user.photoURL;
+            message.displayName = user.displayName;
+          }
+        });
+        if(message.replyTo) {
+          const index = this.messages.findIndex(item => item.id === message.replyTo);
+          message.replyToMessageType = this.messages[index] ? this.messages[index].type : 'text';
+          if(message.replyToMessageType === 'text') {
+            message.replyToMessage = this.messages[index] ? this.messages[index].message : '<i>Message not found</i>';
+          } else if(message.replyToMessageType === 'image' || message.replyToMessageType === 'video') {
+            message.replyToMessage = this.messages[index] ? this.messages[index].url : '<i>Message not found</i>';
+          }
+        }
+        this.messages.push(message);
+      });
+      // Load messages in relation to numOfMessages.
+      if (this.startIndex == -1) {
+        // Get initial index for numberOfMessages to show.
+        if ((this.messages.length - this.numberOfMessages) > 0) {
+          this.startIndex = this.messages.length - this.numberOfMessages;
+        } else {
+          this.startIndex = 0;
+        }
+      }
+      if (!this.messagesToShow) {
+        this.messagesToShow = [];
+      }
+      // Set messagesToShow
+      for (var i = this.startIndex; i < this.messages.length; i++) {
+        this.messagesToShow.push(this.messages[i]);
+      }
+      this.loadingProvider.dismissLoader();
+    }
   }
 
   // Load previous messages in relation to numberOfMessages.
@@ -216,25 +275,32 @@ export class GroupPage implements OnInit {
   }
 
   // Send text message to the group.
-  send(type) {
+  async send(type) {
     // Clone an instance of messages object so it will not directly be updated.
     // The messages object should be updated by our observer declared on ionViewDidLoad.
-    let messages = JSON.parse(JSON.stringify(this.messages));
+    // let messages = JSON.parse(JSON.stringify(this.messages));
 
     let obj = {
       date: new Date().toString(),
       sender: firebase.auth().currentUser.uid,
       type: type,
       message: this.message,
-      id: this.firestore.createId()
+      id: this.firestore.createId(),
+      replyTo: this.replyMessage.id || null
     }
 
+    this.messages.push(obj);
+    this.displayMessages(this.messages);
+
     // Update group messages.
-    this.firestore.set(`groups/${this.groupId}/messages/${obj.id}`, obj);
+    await this.firestore.set(`groups/${this.groupId}/messages/${obj.id}`, obj);
     // this.dataProvider.getGroup(this.groupId).update({ messages: messages });
-    // Clear messagebox.
+    // Clear messagebox
     this.message = '';
     this.scrollBottom();
+    this.replyMessage.id = null;
+    this.replyMessage.displayName = null;
+    this.replyMessage.message = null;
   }
 
   enlargeImage(img) {
@@ -280,9 +346,8 @@ export class GroupPage implements OnInit {
         handler: () => {
           console.log("Video");
           if((window as any).cordova) {
-            this.loadingProvider.presentProcessingLoading();
+           // this.loadingProvider.presentProcessingLoading();
             this.imageProvider.uploadVideoMessage(this.groupId).then(url => {
-              // this.displayProgress();
               this.sendVideoMessage(url);
             }, err => {
               this.loadingProvider.dismissLoader();
@@ -340,7 +405,7 @@ export class GroupPage implements OnInit {
 
   // Process photoMessage on database.
   sendPhotoMessage(url) {
-    let messages = JSON.parse(JSON.stringify(this.messages));
+    // let messages = JSON.parse(JSON.stringify(this.messages));
     let obj = {
       date: new Date().toString(),
       sender: firebase.auth().currentUser.uid,
@@ -348,15 +413,20 @@ export class GroupPage implements OnInit {
       url: url,
       id: this.firestore.createId()
     };
+
+    this.messages.push(obj);
+    this.displayMessages(this.messages);
+
     this.firestore.set(`groups/${this.groupId}/messages/${obj.id}`, obj);
+    this.scrollBottom();
     // this.dataProvider.getGroup(this.groupId).update({
     //   messages: messages
     // });
     this.message = '';
   }
 
-  sendVideoMessage(url) {
-    let messages = JSON.parse(JSON.stringify(this.messages));
+  async sendVideoMessage(url) {
+    // let messages = JSON.parse(JSON.stringify(this.messages));
     let obj = {
       date: new Date().toString(),
       sender: firebase.auth().currentUser.uid,
@@ -364,9 +434,14 @@ export class GroupPage implements OnInit {
       url: url,
       id: this.firestore.createId()
     };
+
+    this.messages.push(obj);
+    this.displayMessages(this.messages);
+
     this.firestore.set(`groups/${this.groupId}/messages/${obj.id}`, obj);
     this.scrollBottom();
-    this.loadingProvider.dismissLoader();
+    await this.loadingProvider.closeProgress();
+    await this.loadingProvider.dismissLoader();
     // this.dataProvider.getGroup(this.groupId).update({
     //   messages: messages
     // });
@@ -408,13 +483,13 @@ export class GroupPage implements OnInit {
       this.firestore.progressVal.subscribe(val => {
         console.log('group page %', val);
       });
-      // this.displayProgress();
+      this.loadingProvider.displayProgress();
       this.firestore
       .uploadVideoString(url, `${Date.now()}-${this.currentUser.uid}`)
       .then(
         async (link) => {
           this.sendVideoMessage(link);
-          this.loadingProvider.dismissLoader();
+          await this.loadingProvider.dismissLoader();
         },
         (err) => {
           this.loadingProvider.dismissLoader();
@@ -427,15 +502,6 @@ export class GroupPage implements OnInit {
 
   test() {
     alert('loaded');
-  }
-
-  async displayProgress() {
-    const modal = await this.modalCtrl.create({
-      component: UploadProgressComponent,
-      cssClass: 'upload-modal',
-      backdropDismiss: true
-    });
-    modal.present();
   }
 
 
@@ -485,6 +551,40 @@ export class GroupPage implements OnInit {
   openUrl(url: string) {
     console.log('url clicked');
     window.open(url, '_system');
+  }
+
+  drag(event: any, msg: any) {
+    const slidingItem = document.getElementById('slidingItem' + msg.id) as any;
+    setTimeout(() => {
+      slidingItem.close();
+      this.replyMessage.id = msg.id;
+      this.replyMessage.message = msg.message || msg.url;
+      this.replyMessage.displayName = msg.displayName;
+      this.replyMessage.type = msg.type;
+    }, 100);
+  }
+
+  getRepliedMessage(msgID: string) {
+    let index = this.messages.findIndex(item => item.id === msgID);
+    if(index > -1) {
+      return this.messages[index];
+    } else {
+      return {
+        displayName: null
+      }
+    }
+  }
+
+  scrollTo(elementId: string) {
+    if(!document.getElementById(elementId)) return;
+
+    let y = document.getElementById(elementId).offsetTop;
+
+    document.getElementById(elementId).classList.add('blur');
+    this.content.scrollToPoint(0, y - 100);
+    setTimeout(() => {
+      document.getElementById(elementId).classList.remove('blur');
+    }, 1000);
   }
 
 

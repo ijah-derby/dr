@@ -63,12 +63,12 @@ export class DataService {
 
   // Get messages of the conversation given the Id.
   getConversationMessages(conversationId) {
-    return this.firestore.col$('conversations/' + conversationId + '/messages', ref => ref.orderBy('createdAt'));
+    return this.firestore.colOnce$('conversations/' + conversationId + '/messages', ref => ref.orderBy('createdAt', 'desc'));
   }
 
   // Get messages of the group given the Id.
-  getGroupMessages(groupId) {
-    return this.firestore.col$('groups/' + groupId + '/messages', ref => ref.orderBy('createdAt'));
+  getGroupMessages(groupId, date) {
+    return this.firestore.colOnce$('groups/' + groupId + '/messages', ref => ref.orderBy('createdAt').startAt(date));
   }
 
   // Get groups of the logged in user.

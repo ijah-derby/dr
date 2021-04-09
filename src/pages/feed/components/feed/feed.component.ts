@@ -41,7 +41,6 @@ export class FeedComponent extends Extender implements OnInit {
   public notificationCounter: number = 0;
 
   videos;
-  progressVal = 0;
   constructor(
     protected injector: Injector,
     private themeableBrowser: ThemeableBrowser,
@@ -589,6 +588,9 @@ browser.on('closePressed').subscribe(data => {
 
  
 
+  openStream() {
+    window.open('https://dontramp.com/stream/stream-list', '_system', 'location=yes');
+    }
 
   
 }

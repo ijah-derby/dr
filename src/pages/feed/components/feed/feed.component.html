@@ -30,8 +30,6 @@
 <!--</ion-toolbar>-->
 
 
- 
-
 <ion-toolbar class="tool" color="favorite">
   <ion-buttons slot="start">
     <ion-icon
@@ -55,6 +53,11 @@
   <ion-icon src="assets/icons/book-outline.svg" color="medium" class="knowledge" mode="md"></ion-icon>
 </ion-button>
 
+<ion-button
+  fill="clear"
+  (click)="openStream()">
+  <ion-icon src="assets/icons/video.svg" color="medium" class="knowledge" mode="md"></ion-icon>
+</ion-button>
 
   <ion-menu-button class="headphones" menu="second" autoHide="true">
     <ion-icon src="assets/icons/play-outline.svg" color="medium"></ion-icon>

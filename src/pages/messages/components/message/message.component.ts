@@ -72,6 +72,7 @@ export class MessageComponent extends Extender implements OnInit {
     }
   
     async ionViewDidEnter() {
+      console.log('ionViewDidEnter');
       this.loggedInUserId = firebase.auth().currentUser.uid;
 
       this.currentUser = await this.authService.getUser();
@@ -91,6 +92,8 @@ export class MessageComponent extends Extender implements OnInit {
           this.dataProvider.getConversationMessages(this.conversationId).subscribe((messagesRes: any[]) => {
   
             let messages = messagesRes;
+            this.scrollBottom();
+            console.log("SCROLL TO BOTTOM CALLED");
             if (messages == null)
               messages = [];
             if (this.messages) {
@@ -130,6 +133,7 @@ export class MessageComponent extends Extender implements OnInit {
                 this.messagesToShow.push(this.messages[i]);
               }
               this.loadingProvider.presentProcessingLoading();
+
             }
           });
         }

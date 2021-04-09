@@ -74,6 +74,7 @@ export class GroupInfoPage implements OnInit {
     // Get user details.
     this.dataProvider.getCurrentUser().subscribe((user:any) => {
       this.user = user;
+      console.log('current user',this.user.uid);
     });
   }
 
@@ -233,19 +234,20 @@ export class GroupInfoPage implements OnInit {
             // Upload photo and set to group photo, afterwwards, return the group object as promise.
             this.imageProvider.setGroupPhotoPromise(this.group, this.camera.PictureSourceType.CAMERA).then((group) => {
               // Add system message.
-              this.group.messages.push({
+              let msgObj = {
                 date: new Date().toString(),
                 sender: this.user.uid,
                 type: 'system',
                 message: this.user.displayName + ' has changed the group photo.',
-                icon: 'camera-outline'
-              });
+                icon: 'camera-outline',
+                id: this.firestore.createId()
+              };
               // Update group image on database.
               this.firestore.update(`groups/${this.groupId}`,{
-                img: group.img,
-                messages: this.group.messages
+                img: group.img
               }).then((success) => {
                 this.loadingProvider.dismissLoader();
+                this.firestore.set(`groups/${this.groupId}/messages/${msgObj.id}`, msgObj);
                 this.loadingProvider.showToast("Updated Successfully")
               }).catch((error) => {
                 this.loadingProvider.dismissLoader();
@@ -326,25 +328,30 @@ export class GroupInfoPage implements OnInit {
             // Remove member from group.
             this.group.members.splice(this.group.members.indexOf(this.user.uid), 1);
             // Add system message.
-            this.group.messages.push({
+            let msgObj = {
               date: new Date().toString(),
               sender: this.user.uid,
               type: 'system',
               message: this.user.displayName + ' has left this group.',
-              icon: 'log-out-outline'
-            });
+              icon: 'log-out-outline',
+              id: this.firestore.createId()
+            }
             // Update group on database.
             this.firestore.update(`groups/${this.groupId}`,{
-              members: this.group.members,
-              messages: this.group.messages
+              members: this.group.members
             }).then((success) => {
               // Remove group from user's group list.
+              this.firestore.set(`groups/${this.groupId}/messages/${msgObj.id}`, msgObj);
               this.firestore.delete('users/' + firebase.auth().currentUser.uid + '/groups/' + this.groupId).then(() => {
                 // Pop this view because user already has left this group.
                 this.group = null;
                 setTimeout(() => {
                   this.loadingProvider.dismissLoader();
-                  this.navCtrl.navigateForward('messages');
+                  this.navCtrl.navigateForward('messages', {
+                    queryParams: {
+                      isRefresh: true
+                    }
+                  });
                 }, 300);
               });
             }).catch((error) => {
@@ -372,15 +379,23 @@ export class GroupInfoPage implements OnInit {
             let group = JSON.parse(JSON.stringify(this.group));
             console.log(group);
             // Delete all images of image messages.
-            group.messages.forEach((message) => {
+            let msgs = [];
+            this.firestore.col$(`groups/${this.group.id}/messages`).subscribe(resp => {
+              msgs = resp;
+            });
+            msgs.forEach((message) => {
               if (message.type == 'image') {
                 console.log("Delete: " + message.url + " of " + group.id);
                 this.imageProvider.deleteGroupImageFile(group.id, message.url);
               }
             });
 
-            this.firestore.delete('users/' + firebase.auth().currentUser.uid + '/groups/' + group.id).then(() => {
-              this.firestore.delete('groups/' + group.id);
+            this.groupMembers.forEach((member: any, index: number) => {
+              this.firestore.delete('users/' + member + '/groups/' + group.id).then(() => {
+                if(index === (group.members.length - 1)) {
+                  this.firestore.delete('groups/' + group.id);
+                }
+              });
             });
             // Delete group image.
             console.log("Delete: " + group.img);
@@ -399,6 +414,64 @@ export class GroupInfoPage implements OnInit {
       queryParams: {
         id: this.groupId
       }
+    });
+  }
+
+  async askRemove(member: any) {
+    let alert = await this.alertCtrl.create({
+      header: 'Remove ' + member.displayName,
+      message: 'Do you want to remove ' + member.displayName  + ' from group?',
+      buttons: [
+        {
+          text: 'Remove',
+          handler: () => {
+            this.removeMember(member);
+          }
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        }
+      ]
+    });
+    alert.present();
+  }
+
+  removeMember(member: any) {
+    this.loadingProvider.presentProcessingLoading();
+    // Remove member from group.
+    this.group.members.splice(this.group.members.indexOf(member.uid), 1);
+    this.groupMembers.splice(this.groupMembers.indexOf(member), 1);
+
+    // Add system message.
+    let msg = {
+      date: new Date().toString(),
+      sender: this.user.uid,
+      type: 'system',
+      message: this.user.displayName + ' has removed ' + member.displayName + '. ',
+      icon: 'log-out-outline',
+      id: this.firestore.createId()
+    };
+    // Update group on database.
+    this.firestore.update(`groups/${this.groupId}`,{
+      members: this.group.members
+    }).then((success) => {
+      // Remove group from user's group list.
+
+      this.firestore.set(`groups/${this.groupId}/messages/${msg.id}`, msg);
+
+      this.firestore.delete('users/' + member.uid + '/groups/' + this.groupId).then(() => {
+        // Pop this view because user already has left this group.
+        this.loadingProvider.dismissLoader();
+        // this.group = null;
+        // setTimeout(() => {
+        //   this.loadingProvider.dismissLoader();
+        //   this.navCtrl.navigateForward('messages');
+        // }, 300);
+      });
+    }).catch((error) => {
+      this.loadingProvider.dismissLoader();
+      this.loadingProvider.showToast("Something went wrong")
     });
   }
 

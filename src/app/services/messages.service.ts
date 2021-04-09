@@ -30,7 +30,6 @@ export class MessagesService {
     this.dataProvider.getGroups().subscribe((groupIdsRes: any[]) => {
       let groupIds = [];
       groupIds = groupIdsRes;
-      console.log(groupIds);
       if (groupIds.length > 0) {
         this.groupsInfo = groupIds;
         if (this.groups && this.groups.length > groupIds.length) {
@@ -38,13 +37,11 @@ export class MessagesService {
           this.groups = [];
         }
         groupIds.forEach((groupId) => {
-          console.log('groupId', groupId);
           this.dataProvider.getGroup(groupId.id).subscribe((groupRes: any) => {
-            console.log(groupRes);
             let group = groupRes;
             if (group.id != null) {
 
-              this.firestore.col$(`groups/${groupId.id}/messages`).subscribe((resp: any[]) => {
+              this.firestore.col$(`groups/${groupId.id}/messages`, ref => ref.orderBy('createdAt').startAt(groupId.createdAt)).subscribe((resp: any[]) => {
                 group.messages = resp;
                 group.unreadMessagesCount = group.messages ? group.messages.length - groupId.messagesRead : 0;
                 // Get group's last active date
@@ -91,57 +88,53 @@ export class MessagesService {
         let conversations = [];
         conversations = conversationsInfoRes.map(c => ({ key: c.id, ...c }));
 
-        console.log(conversations);
         this.conversationsInfo = [];
 
         if (conversations.length > 0) {
           this.conversationsInfo = conversations;
           conversations.forEach((conversation) => {
-            console.log(conversation);
             if (conversation) {
+              console.log('LOOP TOP');
               // Get conversation partner info.
               this.dataProvider.getUser(conversation.key).subscribe((user) => {
-                console.log('user', conversation.sender);
                 conversation.friend = user;
                 // Get conversation info.
 
-                this.dataProvider.getConversation(conversation.conversationId).subscribe((obj: any) => {
-                  // Get last message of conversation.
-                  console.log(obj);
-                  if (obj != null) {
-                    this.firestore.colWithIds$('conversations/' + conversation.conversationId + '/messages', ref => ref.orderBy('createdAt', 'desc')).subscribe(resp => {
-                      console.log('resp', resp);
-                      // resp = resp.reverse();
-                      let lastMessage = resp[0];
-                      if(!lastMessage) {
-                        return;
-                      }
-                      console.log('lastMsg', lastMessage);
-                      conversation.date = lastMessage.date;
-                      conversation.sender = lastMessage.sender;
-                      // Set unreadMessagesCount
-                      conversation.unreadMessagesCount = resp.length - conversation.messagesRead;
-                      console.log(conversation.unreadMessagesCount);
-                      // Process last message depending on messageType.
-                      if (lastMessage.type == 'text') {
-                        if (lastMessage.sender == currentUser.uid) {
-                          conversation.message = 'You: ' + lastMessage.message;
-                        } else {
-                          conversation.message = lastMessage.message;
-                        }
-                        console.log('conv', conversation);
-                      } else {
-                        if (lastMessage.sender == currentUser.uid) {
-                          conversation.message = 'You sent a photo message.';
-                        } else {
-                          conversation.message = 'has sent you a photo message.';
-                        }
-                      }
-                      // Add or update conversation.
-                      this.addOrUpdateConversation(conversation);
-                    });
+                this.firestore.colWithIds$('conversations/' + conversation.conversationId + '/messages', ref => ref.orderBy('createdAt', 'desc')).subscribe(resp => {
+                  // resp = resp.reverse();
+                  console.log('COL WITH IDs');
+                  let lastMessage = resp[0];
+                  if(!lastMessage) {
+                    return;
                   }
+                  conversation.date = lastMessage.date;
+                  conversation.sender = lastMessage.sender;
+                  // Set unreadMessagesCount
+                  conversation.unreadMessagesCount = resp.length - conversation.messagesRead;
+                  // Process last message depending on messageType.
+                  if (lastMessage.type == 'text') {
+                    if (lastMessage.sender == currentUser.uid) {
+                      conversation.message = 'You: ' + lastMessage.message;
+                    } else {
+                      conversation.message = lastMessage.message;
+                    }
+                  } else {
+                    if (lastMessage.sender == currentUser.uid) {
+                      conversation.message = 'You sent a photo message.';
+                    } else {
+                      conversation.message = 'has sent you a photo message.';
+                    }
+                  }
+                  // Add or update conversation.
+                  this.addOrUpdateConversation(conversation);
                 });
+
+                // this.dataProvider.getConversation(conversation.conversationId).subscribe((obj: any) => {
+                //   // Get last message of conversation.
+                //   if (obj != null) {
+                   
+                //   }
+                // });
               });
             }
 
@@ -171,7 +164,6 @@ export class MessagesService {
 
 
   addOrUpdateConversation(conversation) {
-    console.log('conversation', conversation);
     if (!this.conversations) {
       this.conversations = [conversation];
     } else {
@@ -183,10 +175,8 @@ export class MessagesService {
       //   }
       // }
       if (index > -1) {
-        console.log("conv index", conversation);
         this.conversations[index] = conversation;
       } else {
-        console.log("conv pushing", conversation);
         this.conversations.push(conversation);
       }
       // Sort by last active date.

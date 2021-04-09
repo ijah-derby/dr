@@ -1,16 +1,19 @@
 import { Injectable } from "@angular/core";
-import { LoadingController, ToastController } from "@ionic/angular";
+import { LoadingController, ModalController, ToastController } from "@ionic/angular";
 import { TranslateService } from "@ngx-translate/core";
+import { UploadProgressComponent } from "../component/upload-progress/upload-progress.component";
 
 @Injectable({
   providedIn: "root",
 })
 export class LoaderService {
   loading: any;
+  progressModal: HTMLIonModalElement;
   constructor(
     public loadingController: LoadingController,
     private translate: TranslateService,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
+    private modalCtrl: ModalController
   ) {
     setTimeout(() => this.dismissLoader(), 5000);
   }
@@ -67,6 +70,19 @@ export class LoaderService {
       cssClass: "custom-class custom-loading",
     });
     return await loading.present();
+  }
+
+  async displayProgress() {
+    this.progressModal = await this.modalCtrl.create({
+      component: UploadProgressComponent,
+      cssClass: 'upload-modal',
+      backdropDismiss: true
+    });
+    this.progressModal.present();
+  }
+
+  async closeProgress() {
+    this.progressModal.dismiss();
   }
 
   showToast(message) {

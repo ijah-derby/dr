@@ -101,7 +101,7 @@
       </div>
 
       <div
-        *ngIf="progressVal <= 0 && videoUrl && videoUrl != ''"
+        *ngIf="videoUrl && videoUrl != '' && !isVideoUploading"
       >
         <div>
           <ion-icon
@@ -112,7 +112,7 @@
           <video
             style="width: 100%; border: 1px solid lightgray;"
             controls
-            [src]="videoUrl"
+            [src]="displayUrl"
           ></video>
         </div>
       </div>
@@ -140,10 +140,10 @@
           </ion-button>
         </div>
       </div>
-      <div style="margin-top: 5%;" *ngIf="progressVal > 0">
+      <div style="margin-top: 5%;" *ngIf="progress > 0">
         <ion-progress-bar
           color="primary"
-          [value]="progressVal / 100"
+          [value]="progress / 100"
         ></ion-progress-bar>
         <p class="ion-no-margin" style="font-size: 12px; margin-top: 5px;">
           Uploading Video...

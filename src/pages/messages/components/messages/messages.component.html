@@ -8,9 +8,18 @@
         (click)="openMenu()"
       ></ion-icon>
     </ion-buttons>
-    <ion-title>Chats</ion-title>
+    
     <ion-buttons slot="end">
-      <ion-button (click)="createGroup()">Create Group</ion-button>
+
+      <img
+      id="hide"
+      alt="appicon"
+      height="22"
+      class="ion-float-right"
+      src="assets/images/logo1.png"
+    />
+
+      
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -21,7 +30,7 @@
       <ion-label>Chats</ion-label>
     </ion-segment-button>
     <ion-segment-button value="group">
-      <ion-label>Groups <ion-badge color="danger" *ngIf="messagesService.getUnreadGroupMessagesCount() > 0">{{messagesService.getUnreadGroupMessagesCount()}}</ion-badge></ion-label>
+      <ion-label>Groups <ion-badge color="green" *ngIf="messagesService.getUnreadGroupMessagesCount() > 0">{{messagesService.getUnreadGroupMessagesCount()}}</ion-badge></ion-label>
     </ion-segment-button>
   </ion-segment>
 
@@ -51,7 +60,7 @@
     <ion-list lines="none" *ngIf="messagesService.conversations && messagesService.conversations.length > 0">
   
       <div *ngFor="let conversation of messagesService.conversations | conversationFilter:searchFriend">
-        <ion-item *ngIf="conversation.blocked != true" (click)="message(conversation.key)">
+        <ion-item *ngIf="conversation.blocked != true" [ngClass]="{'unread-conv': conversation.unreadMessagesCount > 0}" (click)="message(conversation.key, conversation.friend.displayName, conversation.friend.photoURL)">
   
           <ion-avatar slot="start" *ngIf="conversation.friend">
             <img src="{{conversation.friend.photoURL}}" onError="this.src='./assets/images/default-dp.png'">
@@ -59,19 +68,18 @@
           <div [ngClass]=hasUnreadMessages(conversation)>
             <ion-label>
               <ion-text>
-                <h2 *ngIf="conversation.friend">{{conversation.friend.displayName}}</h2>
+                <h2 *ngIf="conversation.friend" [ngStyle]="{'font-weight: 600 !important': conversation.unreadMessagesCount > 0}">{{conversation.friend.displayName}}</h2>
               </ion-text>
               <ion-text>
-                <p>{{conversation.message}}</p>
+                <p [ngStyle]="{'font-weight: 600 !important': conversation.unreadMessagesCount > 0}">{{conversation.message}}</p>
               </ion-text>
             </ion-label>
           </div>
           <div slot="end" style="display: flex;flex-direction: column;align-items: flex-end;">
-            <ion-badge color="danger" *ngIf="conversation.unreadMessagesCount > 0">
-              {{conversation.unreadMessagesCount}}
-            </ion-badge>
             <ion-text style="color: #777;font-size: 12px;position: relative;
             top: -10px;">{{conversation.date | DateFormat}}</ion-text>
+            <div class="msg-circle" *ngIf="conversation.unreadMessagesCount > 0">
+            </div>
           </div>
         </ion-item>
       </div>
@@ -113,21 +121,29 @@
                 <p>{{group.date | DateFormat}}</p>
               </ion-text>
             </ion-label>
-            <ion-badge slot="end" color="danger" *ngIf="group.unreadMessagesCount > 0">{{group.unreadMessagesCount}}
+            <ion-badge slot="end" color="green" *ngIf="group.unreadMessagesCount > 0">{{group.unreadMessagesCount}}
             </ion-badge>
           </ion-item>
         </ng-container>
       </ion-list>
     </div>
   </ng-container>
+
+
+<ion-fab vertical="bottom" horizontal="end" slot="fixed">
+  <ion-fab-button class="colr" color="light"  routerLink="/newgroup">
+    <ion-icon class="colr" name="add-circle"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
+
   
 </ion-content>
 
 <ion-toolbar color="secondary">
   <ion-tabs>
     <ion-tab-bar color="favorite" slot="bottom">
-      <ion-tab-button routerLink="/profile" routerDirection="forward">
-        <ion-icon  src="assets/icons/person-outline.svg" color="primary" style="width: 30px; height: 50px;"></ion-icon>
+      <ion-tab-button routerLink="/feed" routerDirection="forward">
+        <ion-icon src="assets/icons/home-outline.svg" color="primary" style="width: 30px; height: 50px;"></ion-icon>
       </ion-tab-button>
 
       <ion-tab-button routerLink="/people" routerDirection="forward">
@@ -138,15 +154,9 @@
         ></ion-icon>
       </ion-tab-button>
 
-      <ion-tab-button (click)="addPost()">
-        <ion-icon
-        src="assets/icons/add-circle-outline.svg"
-        color="primary" 
-          style="width: 30px; height: 50px;"
-        ></ion-icon>
-      </ion-tab-button>
+      
 
-      <ion-tab-button (click)="goToMessages()">
+      <!-- <ion-tab-button (click)="goToMessages()">
         <ion-icon src="assets/icons/mail-outline.svg" color="primary" style="width: 30px; height: 50px;"></ion-icon>
         <ion-badge
           *ngIf="messagesService.getUnreadMessagesCount() > 0 || messagesService.getUnreadGroupMessagesCount() > 0"
@@ -154,7 +164,7 @@
           style="margin-bottom: 7px;"
           color="green"
           >{{ messagesService.getUnreadMessagesCount() + messagesService.getUnreadGroupMessagesCount() }}</ion-badge>
-      </ion-tab-button>
+      </ion-tab-button> -->
 
       <ion-tab-button (click)="goToNotifications()">
         <ion-icon
@@ -172,4 +182,5 @@
       </ion-tab-button>
     </ion-tab-bar>
   </ion-tabs>
+
 </ion-toolbar>

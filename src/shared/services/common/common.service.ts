@@ -5,7 +5,7 @@ import { Camera, CameraOptions } from '@ionic-native/camera/ngx';
 import { Diagnostic } from '@ionic-native/diagnostic/ngx';
 import { ImagePicker } from '@ionic-native/image-picker/ngx';
 import { SocialSharing } from '@ionic-native/social-sharing/ngx';
-import { of } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { Observable } from 'rxjs/internal/Observable';
 import { map } from 'rxjs/internal/operators';
 import {AuthService} from '../../../pages/auth/services/auth/auth.service';
@@ -46,7 +46,7 @@ export class CommonService extends Extender {
     super(injector);
   }
 
-  /** get list of countries from free api */
+  /* get list of countries from free api */
   public getCountries(): Observable<any> {
     if (this.countries.length === 0) {
       return this.http.get<any[]>('https://restcountries.eu/rest/v2/all').pipe(
@@ -60,7 +60,7 @@ export class CommonService extends Extender {
     }
   }
 
-  /** search country by name */
+  /* search country by name */
   public searchCountry(search): Observable<any> {
     return this.http.get<any[]>('https://restcountries.eu/rest/v2/name/' + search).pipe(
       map((res) => {
@@ -161,57 +161,74 @@ export class CommonService extends Extender {
   }
 
   public async getVideo() {
-    let retrievedFile;
-    const options: CameraOptions = {
-      mediaType: (<any>window).Camera.MediaType.VIDEO,
-      destinationType: (<any>window).Camera.DestinationType.FILE_URI,
-      sourceType: (<any>window).Camera.PictureSourceType.PHOTOLIBRARY
-    };
-
-    return this.camera.getPicture(options)
-      .then( async (videoUrl) => {
-        console.log('video url', videoUrl);
-        this.convertToBase64(videoUrl);
-        if (videoUrl) {
-          const filename = videoUrl.substr(videoUrl.lastIndexOf('/') + 1);
-          let dirpath = videoUrl.substr(0, videoUrl.lastIndexOf('/') + 1);
-          dirpath = dirpath.includes('file://') ? dirpath : 'file://' + dirpath;
-          try {
-            const dirUrl = await this.file.resolveDirectoryUrl(dirpath);
-            retrievedFile = await this.file.getFile(dirUrl, filename, {});
-            console.log('retrieved file', retrievedFile);
-            // const reader = new FileReader();
-            // reader.readAsDataURL(retrievedFile);
-            // reader.onload = () => console.log('base64',reader.result);
-            let sV = this.webView.convertFileSrc(retrievedFile.nativeURL);
-            console.log('sV is -->', sV);
-            return sV;
-            // return retrievedFile.file( async data => {
-            //   console.log('data', data);
+    return new Promise((resolve, reject) => {
+      let retrievedFile;
+      const options: CameraOptions = {
+        quality: 100,
+        destinationType: this.camera.DestinationType.DATA_URL,
+        sourceType: this.camera.PictureSourceType.PHOTOLIBRARY,
+        mediaType: this.camera.MediaType.VIDEO
+      };
+  
+      return this.camera.getPicture(options)
+        .then( async (videoUrl) => {
+          console.log('video url', videoUrl);
+         
+          if (videoUrl) {
+            const filename = videoUrl.substr(videoUrl.lastIndexOf('/') + 1);
+            let dirpath = videoUrl.substr(0, videoUrl.lastIndexOf('/') + 1);
+            dirpath = dirpath.includes('file://') ? dirpath : 'file://' + dirpath;
+            
+            try {
+              const dirUrl = await this.file.resolveDirectoryUrl(dirpath);
+              retrievedFile = await this.file.getFile(dirUrl, filename, {});
               
-            // });
-          } catch (err) {
-            console.log('error 1', err);
-            return "";
+              console.log('retrieved file', retrievedFile);
+              let fileObj = await this.getFile(retrievedFile) as any;
+              console.log('fileObj', fileObj);
+  
+              this.getBase64(fileObj).then((resp: any) => {
+                if(resp) {
+                  this.videoBase64 = resp;
+                  let sV = this.webView.convertFileSrc(retrievedFile.nativeURL);
+                  // sV = await this.toBase64(sV) as any;
+                  console.log('sV is -->', sV);
+                  resolve(sV);
+                } else {
+                  this.toast("Error in loading video from gallery");
+                  reject('error in getting video');
+                }
+              }, err => {
+                reject(err);
+              });
+              // return retrievedFile.file( async data => {
+              //   console.log('data', data);
+                
+              // });
+            } catch (err) {
+              console.log('error 1', err);
+              reject(err);
+            }
+          } else {
+            reject("video url not found");
           }
-        }
-      },
-      (err) => {
-        console.log('err2', err);
-        return "";
-      });
+        },
+        (err) => {
+          console.log('err2', err);
+          reject(err);
+        });
+    });
   }
-
   private convertToBase64(url: any) {
     this.base64.encodeFile(url).then((base64File: string) => {
-      console.log('base64',base64File);
+      console.log('base64 1',base64File);
       this.videoBase64 = base64File;
     }, (err) => {
       console.log(err);
     });
   }
 
-  /** get files from browser file input and convert to images and resolve all */
+  /* get files from browser file input and convert to images and resolve all */
   public async getImagesFromFiles(event: any) {
     let reads = [];
     const images = Array.prototype.slice.call(event.target.files);
@@ -243,7 +260,7 @@ export class CommonService extends Extender {
     }
   }
 
-  /** get single image from camera or library and append base64 string text and resolve */
+  /* get single image from camera or library and append base64 string text and resolve */
   private async getPicturesNative(type: number) {
     this.cameraOptions.sourceType = type;
     this.cameraOptions.quality = 20;
@@ -257,7 +274,7 @@ export class CommonService extends Extender {
     });
   }
 
-  /** get images from library and append base64 string text and resolve */
+  /* get images from library and append base64 string text and resolve */
   private async getPicturesFromLibrary(): Promise<string[] | any> {
     const options = {
       outputType: 1,
@@ -276,4 +293,34 @@ export class CommonService extends Extender {
         });
     });
   }
+
+
+  async getFile(fileEntry: any) {
+    try {
+      return await new Promise((resolve, reject) => fileEntry.file(resolve, reject));
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+
+  getBase64(file) {
+    return new Promise((resolve, reject) => {
+      const blob = file as Blob;
+      console.log('MY FILE', file);
+      console.log('MY BLOB', blob);
+  
+      var reader = new FileReader();
+      reader.readAsDataURL(blob);
+      reader.onload = function () {
+        console.log('helllllllllllooooooooooooo',reader.result);
+        resolve(reader.result);
+      };
+      reader.onerror = function (error) {
+        console.log('Error: ', error);
+        reject(false);
+      };
+    });
+ }
+ 
 }

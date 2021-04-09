@@ -17,6 +17,7 @@ import { IFeed } from "../../models/feed";
 import { FeedService } from "../../services/feed/feed.service";
 import { AngularFireStorage } from "@angular/fire/storage";
 import { ProgressBarComponent } from "src/app/pages/feed/progress-bar/progress-bar.component";
+import { DomSanitizer } from "@angular/platform-browser";
 
 /**
  * allows the user to edit or add new post, browse, select and store images to firebase storage
@@ -33,7 +34,8 @@ export class FeedAddComponent extends Extender implements OnInit {
   public tempImages: any = [];
   public more: boolean;
   public videoShare: boolean;
-  public videoUrl: string;
+  public videoUrl: any;
+  public displayUrl: any;
   
   public feedOptions = [
     {
@@ -74,8 +76,9 @@ export class FeedAddComponent extends Extender implements OnInit {
   @ViewChild("fileInputButton", null) private fileInputButton: ElementRef;
   @ViewChild("videoInputButton", null) private videoInputButton: ElementRef;
 
-  progressVal = 0;
-  
+  progress = 0;
+  isVideoUploading = false;
+
   constructor(
     protected injector: Injector,
     private navParams: NavParams,
@@ -83,18 +86,18 @@ export class FeedAddComponent extends Extender implements OnInit {
     private commonService: CommonService,
     private feedService: FeedService,
     private firestoreService: FirestoreService,
-    private loaderCtrl: LoadingController
+    private loaderCtrl: LoadingController,
+    public domSanitizer: DomSanitizer
   ) {
     super(injector);
+    firestoreService.progressVal.subscribe((val) => {
+      this.progress = val;
+    })
   }
 
   /** get current user, get id from navParam, if id present get data for feed, if no id set default data */
   public async ngOnInit() {
     this.currentUser = await this.authService.getUser();
-    this.firestoreService.progressVal.next(0);
-    this.firestoreService.progressVal.subscribe(resp => {
-      this.progressVal = resp;
-    })
     const id = this.navParams.get("data");
     if (!id) {
       this.feed = {
@@ -188,8 +191,10 @@ export class FeedAddComponent extends Extender implements OnInit {
 
   /** used for browser image uploads, hooked up to input file type on change event */
   public detectVideo(event: any) {
+    console.log(event);
     this.commonService.getVideoFile(event).then((url: any) => {
       this.videoUrl = url;
+      this.displayUrl = this.domSanitizer.bypassSecurityTrustUrl(this.videoUrl);
       this.loadingService.dismissLoader();
     });
   }
@@ -250,6 +255,8 @@ export class FeedAddComponent extends Extender implements OnInit {
         "?rel=0";
     }
 
+    this.isVideoUploading = true;
+
     this.uploadImage(this.tempImages).then(async (images: string[]) => {
       console.log(images);
       this.feed.images = this.feed.images.concat(images);
@@ -262,9 +269,10 @@ export class FeedAddComponent extends Extender implements OnInit {
         (_data) => {
           console.log("modal closed now");
           loader.dismiss();
+          this.isVideoUploading = false;
           this.closeModal("save");
         },
-        (error) => this.toast(error)
+        (error) => {this.toast(error); this.isVideoUploading = false;}
       );
     });
   }
@@ -289,14 +297,16 @@ export class FeedAddComponent extends Extender implements OnInit {
   }
 
   private async getVideo() {
-    // this.loadingService.presentProcessingLoading();
     if ((window as any).cordova) {
+      await this.loadingService.presentProcessingLoading();
       // if on device use native plugins
-      this.commonService.getVideo().then((url) => {
+      this.commonService.getVideo().then(async (url: any) => {
         this.videoUrl = url;
-        console.log("videoURL", this.videoUrl);
+        this.displayUrl = this.domSanitizer.bypassSecurityTrustUrl(this.videoUrl);
+        await this.loadingService.dismissLoader();
+      }, async err => {
+        await this.loadingService.dismissLoader();
       });
-      this.loadingService.dismissLoader();
     } else {
       // if on device use browser file upload
       (this.videoInputButton.nativeElement as HTMLInputElement).click();
@@ -360,12 +370,16 @@ export class FeedAddComponent extends Extender implements OnInit {
       message: "",
     });
     // loader.present();
-    console.log(this.firestoreService.progressVal);
     if ((window as any).cordova) {
       this.videoUrl = this.commonService.videoBase64;
     }
 
     console.log("videoURL", this.videoUrl);
+
+    if(!this.videoUrl) {
+      this.toast("Invalid Video URL");
+      return;
+    }
 
     this.firestoreService
       .uploadVideoString(this.videoUrl, `${Date.now()}-${this.currentUser.uid}`)

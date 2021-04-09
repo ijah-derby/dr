@@ -304,7 +304,7 @@ export class ImageService {
   }
   uploadGroupVideoMessage(groupId): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.commonService.getVideo().then((url) => {
+      this.commonService.getVideo().then((url: any) => {
         let videoUrl = url;
         videoUrl = this.commonService.videoBase64;
         this.firestore.uploadVideoString(videoUrl, 'DontRamp_chat_' + new Date().getTime()).then(url => {
@@ -357,19 +357,30 @@ export class ImageService {
   }
 
   uploadVideoMessage(conversationId): Promise<any> {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       this.loadingProvider.presentProcessingLoading();
-      this.commonService.getVideo().then((url) => {
+      this.commonService.getVideo().then(async (url: any) => {
         let videoUrl = url;
         videoUrl = this.commonService.videoBase64;
-        this.firestore.uploadVideoString(videoUrl, 'DontRamp_chat_' + new Date().getTime()).then(url => {
-          this.loadingProvider.dismissLoader();
+        await this.loadingProvider.dismissLoader();
+        if(!videoUrl) {
+          return;
+        };
+        console.log("videoBase64URL",  videoUrl);
+        await this.loadingProvider.displayProgress();
+        this.firestore.uploadVideoString(videoUrl, 'DontRamp_chat_' + new Date().getTime()).then(async url => {
+          await this.loadingProvider.dismissLoader();
+          await this.loadingProvider.closeProgress();
           resolve(url);
-        }, err => {
-          this.loadingProvider.dismissLoader();
+        }, async err => {
+          await this.loadingProvider.dismissLoader();
+          await this.loadingProvider.closeProgress();
+          reject(false);
         })
-      }, err => {
-        this.loadingProvider.dismissLoader();
+      }, async err => {
+        console.log('getVideoError', err);
+        await this.loadingProvider.dismissLoader();
+        reject(false);
       });
       // this.mediaCapture.captureVideo().then(data => {
       //   let videoUrl = data[0].fullPath;

@@ -31,6 +31,7 @@ export class NewgroupPage implements OnInit {
   myForm: FormGroup;
   submitAttempt = false;
   errorMessages: any = [];
+  currentUser: any;
 
   constructor(
     private navCtrl: NavController,
@@ -130,6 +131,7 @@ export class NewgroupPage implements OnInit {
       this.group.name = this.name;
       this.group.description = this.description;
       this.group.id = this.firestore.createId();
+      this.group.admin = firebase.auth().currentUser.uid;
       // Add group to database.
       
       this.firestore.set(`groups/${this.group.id}`, this.group).then(() => {

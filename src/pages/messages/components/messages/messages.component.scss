@@ -112,3 +112,24 @@ margin-right: 110px;
   font-size: 10px;
   z-index: 999;
 }
+
+
+.colr{
+  
+  --box-shadow:none;
+  outline: none;
+  border-radius: 50% !important;
+}
+
+.unread-conv {
+  --background: #eeeeeeab;
+    --padding-top: 8px;
+    --padding-bottom: 7px;
+}
+
+.msg-circle {
+  width: 15px;
+  height: 15px;
+  background: #2fcc71;
+  border-radius: 50%;
+}

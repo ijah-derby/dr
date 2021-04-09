@@ -1,5 +1,5 @@
 import { Component, ElementRef, Injector, OnInit, ViewChild } from "@angular/core";
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AngularFireDatabase } from '@angular/fire/database';
 import { AngularFireAuth } from '@angular/fire/auth';
 import * as firebase from "firebase/app";
@@ -46,19 +46,31 @@ export class MessagesComponent extends Extender implements OnInit {
     private menuCtrl: MenuController,
     private navCtrl: NavController,
     private firestore: FirestoreService,
-    public messagesService: MessagesService
+    public messagesService: MessagesService,
+    private route: ActivatedRoute
   ) { 
     super(injector);
+    this.route.queryParamMap.subscribe(params => {
+      if(params.get('isRefresh')) {
+        this.tab = 'chat';
+      }
+    })
   }
 
   ngOnInit() {
     this.searchGroup = '';
-    this.messagesService.initGroups();
+    this.messagesService.initConversation();
     // Get groups
     
   }
 
   segmentChanged(event: any) {
+    console.log(event);
+    if(event.detail.value === 'group') {
+      this.messagesService.initGroups();
+    } else {
+      this.messagesService.initConversation();
+    }
   }
 
   // Open Group Chat.
@@ -79,17 +91,18 @@ export class MessagesComponent extends Extender implements OnInit {
   }
 
   async ionViewDidEnter() {
-   this.messagesService.initConversation();
   }
 
   // Add or update conversation for real-time sync based on our observer, sort by active date.
   
 
   // Open chat with friend.
-  message(userId) {
+  message(userId, name, img) {
     this.navCtrl.navigateForward('message', {
       queryParams: {
-        id: userId
+        id: userId,
+        name: name,
+        img: img
       }
     });
     // this.app.getRootNav().push(MessagePage, { userId: userId });
@@ -128,7 +141,6 @@ export class MessagesComponent extends Extender implements OnInit {
  }
 
   public doRefreshTop(event?: any) {
-    console.log("call in dorefresh", event);
     // this.loadPosts(event);
     // this.feedService
     //   .getFeedPrevious(this.user.uid, cursor)
